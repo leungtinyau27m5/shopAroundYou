@@ -97,18 +97,18 @@ export default class Product extends Component {
                                     flexDirection: 'row',
                                     borderWidth: 1,
                                     borderColor: '#36B449',
-                                    padding: 3,
-                                    borderRadius: 15
+                                    padding: 8,
+                                    borderRadius: 15,
                             }}>
                                 <Ionicons
                                     name="ios-list"
-                                    size={25}
+                                    size={20}
                                     color={'#36B449'}
                                 />
                                 <Text 
                                     style={{
                                         marginLeft: 10,
-                                        fontSize: 16,
+                                        fontSize: 13,
                                         color: '#36B449',
                                 }}>
                                     Read More

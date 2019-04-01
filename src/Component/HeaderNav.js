@@ -36,6 +36,7 @@ export default class HeaderNav extends Component {
                                 iconName="ios-locate"
                                 iconColor="#FFF"
                                 iconSize={28}
+                                locateMyPosition={this.props.locateMyPosition}
                             />
                             <TouchableButton
                                 spacing={5}

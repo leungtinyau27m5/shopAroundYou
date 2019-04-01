@@ -10,7 +10,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 export default class TouchableButton extends Component {
     render () {
         return (
-            <TouchableOpacity style={{paddingHorizontal: 10}}>
+            <TouchableOpacity 
+                style={{paddingHorizontal: 10}} 
+                onPress={() => this.props.locateMyPosition()}>
                 <Ionicons
                     name={this.props.iconName}
                     size={ 28 }

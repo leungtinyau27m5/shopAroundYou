@@ -17,5 +17,6 @@
 }*/
 export const serverConn = {
   serverUri: 'http://192.168.0.103:80/IS/test.php',
+  serverGoogleMapUri: 'http://192.168.0.103/IS/Google_Map/googleMap.php',
   serverAssets: 'http://192.168.0.103:80/IS/'
 }
