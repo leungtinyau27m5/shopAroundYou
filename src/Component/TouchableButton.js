@@ -12,7 +12,7 @@ export default class TouchableButton extends Component {
         return (
             <TouchableOpacity 
                 style={{paddingHorizontal: 10}} 
-                onPress={() => this.props.locateMyPosition()}>
+                onPress={() => this.props.handleOnClick()}>
                 <Ionicons
                     name={this.props.iconName}
                     size={ 28 }

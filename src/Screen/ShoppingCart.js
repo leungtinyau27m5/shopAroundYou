@@ -14,6 +14,7 @@ export default class ShoppingCart extends Component {
     }
     backToHomeScreen = () => {
         this.props.navigation.navigate('Home')
+        BackHandler.removeEventListener('hardwareBackPress', this.backToHomeScreen)
         return true
     }
     render() {

@@ -27,22 +27,24 @@ export default class HeaderNav extends Component {
                         <View style={{flexDirection: 'row'}}>
                             <TouchableButton
                                 spacing={5}
-                                iconName="ios-menu"
+                                iconName="ios-funnel"
                                 iconColor="#FFF"
                                 iconSize={28}
+                                handleOnClick={this.props.filterResult}
                             />
                             <TouchableButton
                                 spacing={5}
                                 iconName="ios-locate"
                                 iconColor="#FFF"
                                 iconSize={28}
-                                locateMyPosition={this.props.locateMyPosition}
+                                handleOnClick={this.props.locateMyPosition}
                             />
                             <TouchableButton
                                 spacing={5}
                                 iconName="ios-search"
                                 iconColor="#FFF"
                                 iconSize={28}
+                                handleOnClick={this.props.searchScreen}
                             />
                         </View>
                     </View>
