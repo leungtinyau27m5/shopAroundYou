@@ -10,9 +10,11 @@ import {
     TouchableOpacity,
     Image
 } from 'react-native'
+//import styled from 'styled-components/native'
 import BackgroundTimer from 'react-native-background-timer'
+import LinearGradient from 'react-native-linear-gradient'
 import {NavigationEvents} from 'react-navigation'
-import Carousel from 'react-native-snap-carousel';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 import HeaderNav from '../Component/HeaderNav'
 import Recommendation from '../Component/Recommendation'
@@ -63,6 +65,12 @@ export default class Home extends Component {
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.alertDialogBox)
     }
+    sceneIsFocus = () => {
+        BackHandler.addEventListener('hardwareBackPress', this.alertDialogBox)
+    }
+    sceneIsBlur = () => {
+        BackHandler.removeEventListener('hardwareBackPress', this.alertDialogBox)
+    }
     alertDialogBox = () => {
         ToastAndroid.show('Double press to exit', ToastAndroid.SHORT)
         BackHandler.addEventListener('hardwareBackPress', this.doubleBackButtonPress)
@@ -75,11 +83,9 @@ export default class Home extends Component {
         BackHandler.exitApp()
         return true
     }
-    filterResult = () => {
-
-    }
     searchScreen = () => {
-
+        this.notInFocus()
+        this.props.navigation.navigate('Explore')
     }
     carouselIsClicked = (index) => {
         if (index == this._carousel.currentIndex)
@@ -110,38 +116,75 @@ export default class Home extends Component {
             </TouchableOpacity>
         )
     }
+    get pagination() {
+        const { thisWeekData, activeSlide } = this.state
+        return (
+            <Pagination
+                dotsLength={thisWeekData.length}
+                activeDotIndex={activeSlide}
+                containerStyle={{ 
+                    backgroundColor: '#333'
+                }}
+                dotStyle={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: 5,
+                    marginHorizontal: 8,
+                    backgroundColor: 'rgba(255, 255, 255, 0.92)'
+                }}
+                inactiveDotStyle={{
+
+                }}
+                inactiveDotOpacity={0.4}
+                inactiveDotScale={0.6}
+            />
+        )
+    }
     render() {
         const screenWidth = Dimensions.get('window').width
-        const screenHeight = Dimensions.get('window').height
         return(
             <View style={{paddingBottom: 100}}>
-                <NavigationEvents onDidFocus={()=> console.log('it is focused')}/>
+                <NavigationEvents 
+                onDidBlur={() => this.sceneIsBlur()}
+                onDidFocus={() => this.sceneIsFocus()}/>
                 <HeaderNav 
-                    locateMyPosition={this.locateMyPosition}
+                    //locateMyPosition={this.locateMyPosition}
                     searchScreen={this.searchScreen}
-                    filterResult={this.filterResult}
+                    //filterResult={this.filterResult}
                 />
                 <ScrollView>
-                    <Text style={{
-                        marginLeft: 'auto',
-                        marginRight: 'auto',
-                        fontSize: 26,
-                        color: '#449954'}}>
-                        Most Wellcome This Week
-                    </Text>
+                    <LinearGradient
+                        start={{x: 0, y: 0}}
+                        end={{x: 1, y: 1}}
+                        colors={['#323232', '#323232']}
+                        style={{paddingVertical: 10}}
+                    >
+                        <Text style={[{
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                            fontSize: 26,
+                            color: '#80FF80'}, styles.test]}>
+                            Most Wellcome This Week
+                        </Text>
+                    </LinearGradient>
+                    <View>
                     <Carousel
                         ref={(c) => { this._carousel = c }}
                         data={this.state.thisWeekData}
                         renderItem={this._renderItem}
                         sliderWidth={screenWidth}
-                        //layout={'tinder'}
-                        //layoutCardOffset={9}
+                        layout={'stack'}
+                        layoutCardOffset={18}
                         sliderHeight={300}
                         itemWidth={screenWidth * 0.7}
                         itemHeight={256}
                         firstItem={0}
+                        autoplay={true}
+                        onSnapToItem={(index) => this.setState({ activeSlide: index })}
                         //onScroll={(index) => console.log(index)}
                     />
+                    { this.pagination }
+                    </View>
                     <Recommendation
                         width={screenWidth}
                         height={200}
@@ -153,6 +196,7 @@ export default class Home extends Component {
         )
     }
 }
+
 const styles = StyleSheet.create({
     slide: {
         height: 300,
@@ -192,5 +236,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         height: 85,
         width: '100%'
+    },
+    test: {
+        textShadowColor: 'rgba(48, 153, 84, 0.75)',
+        textShadowOffset: { width: 2.5, height: 0 },
+        textShadowRadius: 0.67
+    },
+    test1: {
+        textShadowColor: 'rgba(88, 163, 104, 0.75)',
+        textShadowOffset: { width: 0, height: -2 },
+        textShadowRadius: 0.67
     }
 })

@@ -9,8 +9,8 @@ import { createMaterialBottomTabNavigator } from 'react-navigation-material-bott
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import HomeSwtich from './Swtich/HomeSwitch'
+import ExploreSwitch from './Swtich/ExploreSwtich'
 import Dashboard from '../src/Screen/Dashboard'
-import Explore from '../src/Screen/Explore'
 import CartSwitch from './Swtich/ShoppingCartSwitch'
 
 const MaterialBottomTabs = createMaterialBottomTabNavigator({
@@ -22,7 +22,7 @@ const MaterialBottomTabs = createMaterialBottomTabNavigator({
         })
     },
     Explore: { 
-        screen: Explore,
+        screen: ExploreSwitch,
         navigationOptions: ({ navigation }) => ({
             title: 'Explore',
             tabBarColor: '#007ACC'

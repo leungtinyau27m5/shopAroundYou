@@ -8,21 +8,21 @@ import { createSwitchNavigator } from 'react-navigation'
 
 import Home from '../../src/Screen/Home'
 
-const HomeSwithcNav = createSwitchNavigator({
+const HomeSwitchNav = createSwitchNavigator({
     Home: {
         screen: Home
     }
 })
 
 export default class HomeSwitch extends Component {
-    static router = HomeSwithcNav.router
+    static router = HomeSwitchNav.router
     constructor(props) {
         super()
     }
     render() {
         const { navigation } = this.props
         return (
-            <HomeSwithcNav navigation={ navigation }/>
+            <HomeSwitchNav navigation={ navigation }/>
         )
     }
 }

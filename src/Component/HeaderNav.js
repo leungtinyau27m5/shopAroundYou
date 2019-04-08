@@ -24,28 +24,40 @@ export default class HeaderNav extends Component {
                         />
                     </View>
                     <View style={{flex: 1, justifyContent: 'center', alignItems: 'flex-end'}}>
-                        <View style={{flexDirection: 'row'}}>
-                            <TouchableButton
-                                spacing={5}
-                                iconName="ios-funnel"
-                                iconColor="#FFF"
-                                iconSize={28}
-                                handleOnClick={this.props.filterResult}
-                            />
-                            <TouchableButton
-                                spacing={5}
-                                iconName="ios-locate"
-                                iconColor="#FFF"
-                                iconSize={28}
-                                handleOnClick={this.props.locateMyPosition}
-                            />
-                            <TouchableButton
-                                spacing={5}
-                                iconName="ios-search"
-                                iconColor="#FFF"
-                                iconSize={28}
-                                handleOnClick={this.props.searchScreen}
-                            />
+                        <View style={[{flexDirection: 'row'}]}>
+                            <View
+                                style={this.props.filterResult !== undefined && this.props.filterResult !== null ? {display: 'flex'} : {display: 'none'}}
+                            >
+                                <TouchableButton
+                                    spacing={5}
+                                    iconName="ios-funnel"
+                                    iconColor="#FFF"
+                                    iconSize={28}
+                                    handleOnClick={this.props.filterResult}
+                                />
+                            </View>
+                            <View
+                                style={this.props.locateMyPosition !== undefined && this.props.locateMyPosition !== null ? {display: 'flex'} : {display: 'none'}}
+                            >
+                                <TouchableButton
+                                    spacing={5}
+                                    iconName="ios-locate"
+                                    iconColor="#FFF"
+                                    iconSize={28}
+                                    handleOnClick={this.props.locateMyPosition}
+                                />
+                            </View>
+                            <View
+                                style={this.props.searchScreen !== undefined && this.props.searchScreen !== null ? {display: 'flex'} : {display: 'none'}}
+                            >
+                                <TouchableButton
+                                    spacing={5}
+                                    iconName="ios-search"
+                                    iconColor="#FFF"
+                                    iconSize={28}
+                                    handleOnClick={this.props.searchScreen}
+                                />
+                            </View>
                         </View>
                     </View>
                 </LinearGradient>
