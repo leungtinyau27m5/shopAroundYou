@@ -80,7 +80,8 @@ export default class Recommendation extends Component {
                 fontSize: 26, 
                 color: '#e60000',
                 marginLeft: 'auto',
-                marginRight: 'auto'
+                marginRight: 'auto',
+                paddingVertical: 10
             }}>
                 {this.props.title}
             </Text>

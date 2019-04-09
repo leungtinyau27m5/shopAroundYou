@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import {NavigationEvents} from 'react-navigation'
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 
+import { Styles } from '../Component/constants/Styles'
 import HeaderNav from '../Component/HeaderNav'
 import Recommendation from '../Component/Recommendation'
 
@@ -95,20 +96,20 @@ export default class Home extends Component {
     }
     _renderItem = ({item, index}) => {
         return (
-            <TouchableOpacity style={styles.slide}
+            <TouchableOpacity style={Styles.slide}
                 onPress={() => { 
                 //this._carousel.snapToItem(index)
                 this.carouselIsClicked(index)
               }}
             >
-                <View style={styles.card}>
+                <View style={Styles.card}>
                     <Image
-                        style={styles.cardImage}
+                        style={Styles.cardImage}
                         source={item.imageUri}
                     />
-                    <View style={styles.title}>
-                        <Text style={[styles.cardText, {fontSize: 18}]}>{item.shopName}</Text>
-                        <Text style={styles.cardText}>
+                    <View style={Styles.title}>
+                        <Text style={[Styles.cardText, {fontSize: 18}]}>{item.shopName}</Text>
+                        <Text style={Styles.cardText}>
                             {item.text}
                         </Text>
                     </View>
@@ -163,7 +164,7 @@ export default class Home extends Component {
                             marginLeft: 'auto',
                             marginRight: 'auto',
                             fontSize: 26,
-                            color: '#80FF80'}, styles.test]}>
+                            color: '#80FF80'}, styled.titleContainer]}>
                             Most Wellcome This Week
                         </Text>
                     </LinearGradient>
@@ -196,55 +197,8 @@ export default class Home extends Component {
         )
     }
 }
-
-const styles = StyleSheet.create({
-    slide: {
-        height: 300,
-        paddingVertical: 20
-    },
-    card: {
-        borderColor: '#000',
-        borderWidth: 1,
-        alignItems: 'center',
-        height: 230,
-        borderRadius: 25,
-        overflow: 'hidden',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 11,
-        },
-        shadowOpacity: 0.55,
-        shadowRadius: 14.78,
-
-        elevation: 22,
-    },
-    cardImage: {
-        height: 145,
-        borderRadius: 25,
-        borderTopLeftRadius: 25,
-        borderTopRightRadius: 25
-    },
-    cardText: {
-        color: '#FFF',
-        justifyContent: 'center',
-        textAlign: 'center',
-    },
-    title: {
-        backgroundColor: '#66595D',
-        justifyContent: 'center',
-        textAlign: 'center',
-        height: 85,
-        width: '100%'
-    },
-    test: {
-        textShadowColor: 'rgba(48, 153, 84, 0.75)',
-        textShadowOffset: { width: 2.5, height: 0 },
-        textShadowRadius: 0.67
-    },
-    test1: {
-        textShadowColor: 'rgba(88, 163, 104, 0.75)',
-        textShadowOffset: { width: 0, height: -2 },
-        textShadowRadius: 0.67
+const styled = StyleSheet.create({
+    titleContainer: {
+        paddingVertical: 10
     }
 })
