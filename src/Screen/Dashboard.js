@@ -14,11 +14,14 @@ import {
  import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationEvents } from 'react-navigation'
 import Modal from 'react-native-modal'
+import Spinner from 'react-native-loading-spinner-overlay'
+import backgroundTimer from 'react-native-background-timer'
 
 import StackReact from '../Component/carousel/StackRect'
 import DefaultRect from '../Component/carousel/DefaultRect'
 import DashboardAll from '../Component/Dashboard/DashboardAll'
 import LoginModal from '../Component/Auth/LoginModal'
+import LoadingScreen from '../Component/LoadingScreen'
 
 //import Settings from '../Component/Dashboard/Settings'
 
@@ -44,6 +47,7 @@ export default class Dashboard extends Component {
                 cy: 900
             },
             loginModal: false,
+            isLoading: false,
             scrollY: new Animated.Value(0)
         }
         this._getPersonalData()
@@ -74,6 +78,17 @@ export default class Dashboard extends Component {
         this.setState((prevState) => ({
             loginModal: !prevState.loginModal
         }))
+    }
+    userLogin = () => {
+        this.showLoginModal()
+        this.setState({
+            isLoading: true
+        })
+        const jobDone = backgroundTimer.setTimeout(() => {
+            this.setState({
+                isLoading: false
+            })
+        }, 2000)
     }
     render() {
         const screenWidth = Dimensions.get('window').width
@@ -117,6 +132,12 @@ export default class Dashboard extends Component {
             <View>
                 <NavigationEvents 
                 onDidFocus={()=> this.sceneIsFocus()}/>
+                <Spinner
+                    visible={this.state.isLoading}
+                    textContent={'Logging in ... '}
+                    textStyle={{fontSize: 20, color: '#333'}}
+                    color={'#333'}
+                />
                 <Animated.View style={{
                     position: 'absolute',
                     top: 0,
@@ -212,23 +233,10 @@ export default class Dashboard extends Component {
                 >
                     <LoginModal 
                         showLoginModal={this.showLoginModal}
+                        userLogin={this.userLogin}
                     />
                 </Modal>
             </View>
         )
     }
 }
-const styled = StyleSheet.create({
-    buttons: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderColor: '#FFF',
-        borderWidth: 1,
-        borderRadius: 10,
-        backgroundColor: '#FFD600'
-    },
-    buttonText: {
-        fontSize: 16,
-        color: '#FFF'
-    }
-})

@@ -125,7 +125,7 @@ export default class StackReact extends Component {
                     itemWidth={screenWidth * 0.7}
                     itemHeight={256}
                     firstItem={0}
-                    autoplay={true}
+                    //autoplay={true}
                     onSnapToItem={(index) => this.setState({ activeSlide: index })}
                     //onScroll={(index) => console.log(index)}
                 />
