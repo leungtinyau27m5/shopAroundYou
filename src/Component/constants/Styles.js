@@ -6,7 +6,7 @@ import {
 export const Styles = StyleSheet.create({
     slide: {
         height: 300,
-        paddingVertical: 20
+        paddingVertical: 8
     },
     card: {
         borderColor: '#000',
@@ -34,14 +34,19 @@ export const Styles = StyleSheet.create({
     cardText: {
         color: '#FFF',
         justifyContent: 'center',
-        textAlign: 'center',
+        //paddingHorizontal: 15
+        //textAlign: 'center',
     },
     title: {
         backgroundColor: '#66595D',
-        justifyContent: 'center',
-        textAlign: 'center',
+        paddingTop: 8,
+        //justifyContent: 'center',
+        //textAlign: 'center',
         height: 85,
         width: '100%'
+    },
+    carouselTitleContainer: {
+
     }
 })
 

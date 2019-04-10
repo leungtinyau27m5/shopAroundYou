@@ -8,53 +8,59 @@ import {
     StyleSheet,
     Dimensions,
     ScrollView,
-    TouchableOpacity
+    TouchableOpacity,
+    Animated
 } from 'react-native'
+ import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationEvents } from 'react-navigation'
-import LinearGradient from 'react-native-linear-gradient'
-import Recommendation from '../Component/Recommendation'
+import Modal from 'react-native-modal'
 
-const styledSetting = StyleSheet.create({
-    titleContainer: {
-        fontSize: 22,
-        paddingVertical: 8,
-        backgroundColor: '#323232',
-        color: '#FFF',
-        paddingHorizontal: 15
-    },
-    itemTextContainer: {
-        fontSize: 16,
-        paddingVertical: 8
-    }
-})
-function Item(props) {
-    return (
-        <TouchableOpacity style={styledSetting.titleContainer}>
-            <Text style={styledSetting.title}>{props.itemName}</Text>
-        </TouchableOpacity>
-    )
-}
-class SettingBlock extends Component {
+import StackReact from '../Component/carousel/StackRect'
+import DefaultRect from '../Component/carousel/DefaultRect'
+import DashboardAll from '../Component/Dashboard/DashboardAll'
+import LoginModal from '../Component/Auth/LoginModal'
+
+//import Settings from '../Component/Dashboard/Settings'
+
+HEADER_MAX_HEIGHT = 80
+HEADER_MIN_HEIGHT = 40
+PROFILE_MAX_HEIGHT = 100
+PROFILE_MIN_HEIGHT = 60
+export default class Dashboard extends Component {
     constructor(props) {
         super()
         this.state = {
-
+            personalData: {
+                username: null,
+                image: null,
+                cid: null,
+                token: null,
+            },
+            buttons: {
+                login: true,
+                register: true
+            },
+            headerCurve: {
+                cy: 900
+            },
+            loginModal: false,
+            scrollY: new Animated.Value(0)
         }
+        this._getPersonalData()
     }
-    render() {
-        return (
-            <View style={{marginTop: 55}}>
-
-            </View>
-        )
-    }
-}
-export default class Dashboard extends Component {
     componentDidMount() {
         
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.backToHomeScreen)
+    }
+    _getPersonalData = async() => {
+        let personalData = await AsyncStorage.getItem('personalData')
+        if (personalData !== null)
+            personalData = JSON.parse(personalData)
+        this.setState({
+            personalData: personalData
+        })
     }
     sceneIsFocus = () => {
         BackHandler.addEventListener('hardwareBackPress', this.backToHomeScreen)
@@ -64,106 +70,165 @@ export default class Dashboard extends Component {
         BackHandler.removeEventListener('hardwareBackPress', this.backToHomeScreen)
         return true
     }
+    showLoginModal = () => {
+        this.setState((prevState) => ({
+            loginModal: !prevState.loginModal
+        }))
+    }
     render() {
+        const screenWidth = Dimensions.get('window').width
+        const headerHeight = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+            outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+            extrapolate: 'clamp'
+        })
+        const profileHeight = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+            outputRange: [PROFILE_MAX_HEIGHT, PROFILE_MIN_HEIGHT],
+            extrapolate: 'clamp'
+        })
+        const profileMarginTop = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+            outputRange: [
+                HEADER_MAX_HEIGHT - (PROFILE_MAX_HEIGHT / 2), HEADER_MAX_HEIGHT + 5
+            ],
+            extrapolate: 'clamp'
+        })
+        const headerZindex = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
+            outputRange: [0, 1],
+            extrapolate: 'clamp'
+        })
+        const headerTitleBottom = this.state.scrollY.interpolate({
+            inputRange: [
+                0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT,
+                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + 5 + PROFILE_MIN_HEIGHT,
+                HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + 5 + PROFILE_MIN_HEIGHT + 26
+            ],
+            outputRange: [-20, -20, -20, 0],
+            extrapolate: 'clamp'
+        })
+        const headerButtons = this.state.scrollY.interpolate({
+            inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + 5 + PROFILE_MIN_HEIGHT + 26],
+            outputRange: [0, 1],
+            extrapolate: 'clamp'
+        })
         return (
             <View>
                 <NavigationEvents 
                 onDidFocus={()=> this.sceneIsFocus()}/>
-                <View
-                    style={[styled.headerContainer]}
-                >
-                    <View style={[styled.iconContainer]}>
-                        <LinearGradient 
-                            start={{x: 0, y: 0}}
-                            end={{x: 1, y: 1}}
-                            colors={['#4DFF88', '#149F5C']}
-                            style={[styled.headerBottom]}>
-                            <View style={{paddingTop: 15}}>
-                                <View style={{
-                                    paddingHorizontal: 20,
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row'
-                                }}>
-                                    <TouchableOpacity style={{}}>
-                                        <Text>LogIn</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{}}>
-                                        <Text>LogIn</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <Image
-                                    source={require('../assets/img/KLB_01.jpg')}
-                                    style={styled.avatar}
-                                />
-                                <Text style={styled.myName}>
-                                Your User name
-                                </Text>
-                            </View>
-                        </LinearGradient>
+                <Animated.View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: '#149F5C',
+                    height: headerHeight,
+                    zIndex: headerZindex,
+                }}>
+                    <View style={{
+                        flexDirection: 'row',
+                        //zIndex: headerZindex,
+                    }}>
                     </View>
-                </View>
-                <ScrollView
-                    style={[styled.contentContainer]}
+                    <Animated.View style={{ width: '100%', position: 'absolute', alignItems: 'center', bottom: headerTitleBottom}}>
+                        <TouchableOpacity
+                            onPress={() => this.showLoginModal()}
+                        >
+                            <Text style={{ color: '#F6F6F6', fontSize: 14, fontWeight: 'bold'}}>
+                                {this.state.username == null ? 'Touch me to login' : this.state.username}
+                            </Text>
+                        </TouchableOpacity>
+                    </Animated.View>
+                </Animated.View>
+                <ScrollView 
+                    scrollEventThrottle={16}
+                    style={{
+                    //flex: 1, 
+                        width: screenWidth
+                }}
+                    onScroll={Animated.event(
+                        [{nativeEvent: { contentOffset: {y: this.state.scrollY }}}]
+                    )}
                 >
-                    <SettingBlock 
-                    />
-                    <Recommendation
-                        width={window.width}
-                        height={200}
-                        title={'Your Recent Interests'}
-                        target='popular_products'
-                    />
+                    <TouchableOpacity
+                        onPress={() => this.showLoginModal()}
+                    >
+                    <Animated.View style={{
+                        //flex: 1,
+                        height: profileHeight,
+                        width: profileHeight,
+                        borderRadius: PROFILE_MAX_HEIGHT / 2,
+                        borderColor: 'white',
+                        borderWidth: 3,
+                        overflow: 'hidden',
+                        marginTop: profileMarginTop,
+                        marginLeft: 20,
+                    }}>
+                        <Animated.Image 
+                            style={{
+                                width: profileHeight,
+                                height: profileHeight
+                            }}
+                            source={require('../assets/img/user.png')} 
+                        />
+                    </Animated.View>
+                    </TouchableOpacity>
+                    <View>
+                        <Text style={{ 
+                        color: '#000', fontWeight: 'bold', fontSize: 18, paddingLeft: 10}}>
+                            {this.state.username == null ? 'Touch me to login' : this.state.username}
+                        </Text>
+                    </View>
+                    <View>
+                        <DashboardAll personalData={this.state.personalData} />
+                        <View style={{ 
+                            maringTop: 55,
+                            paddingVertical: 15,
+                            width: '100%',
+                            backgroundColor: '#FFF'
+                         }}><Text style={{
+                            fontSize: 26,
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                         }}>Promotion</Text></View>
+                         <StackReact paginationBgColor='#FFF' paginationDotColor='#000'/>
+                         <View style={{ 
+                            paddingVertical: 15,
+                            width: '100%',
+                            backgroundColor: '#FF9800'
+                         }}><Text style={{
+                            fontSize: 26,
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                         }}>You Recently Visit</Text></View>
+                         <DefaultRect />
+                    </View>
                 </ScrollView>
+                <Modal 
+                    isVisible={this.state.loginModal} 
+                    onBackdropPress={() => this.showLoginModal()}
+                    onBackButtonPress={() => {this.setState({ loginModal: false })}}
+                >
+                    <LoginModal 
+                        showLoginModal={this.showLoginModal}
+                    />
+                </Modal>
             </View>
         )
     }
 }
-const window = Dimensions.get('window')
 const styled = StyleSheet.create({
-    headerContainer: {
-        alignSelf: 'center',
-        width: window.width,
-        overflow: 'hidden',
-        height: window.width / 1.7,
-        backgroundColor: '#FFF'
+    buttons: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderColor: '#FFF',
+        borderWidth: 1,
+        borderRadius: 10,
+        backgroundColor: '#FFD600'
     },
-    iconContainer: {
-        borderRadius: window.width,
-        width: window.width * 2,
-        height: window.width * 2,
-        marginLeft: -(window.width / 2),
-        position: 'absolute',
-        bottom: 0,
-        overflow: 'hidden'
-    },
-    headerBottom: {
-        height: window.width / 1.7,
-        width: window.width,
-        position: 'absolute',
-        bottom: 0,
-        marginLeft: window.width / 2,
-        textAlign: 'center'
-        //backgroundColor: '#9DD6EB'
-    },
-    myName: {
-        marginTop: 10,
-        fontSize: 20,
-        color: '#FFF',
-        textShadowRadius: 3,
-        fontWeight: 'bold',
-        textShadowColor: 'rgba(0, 0, 0, 1)',
-        textShadowOffset: {width: 3, height: -1},
-        marginLeft: 'auto',
-        marginRight: 'auto',
-    },
-    avatar: {
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: window.width * 0.3,
-        height: window.width * 0.3,
-        borderRadius: window.width * 0.3 / 2,
-    },
-    contentContainer: {
-        backgroundColor: '#FFF',
+    buttonText: {
+        fontSize: 16,
+        color: '#FFF'
     }
 })

@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import {NavigationEvents} from 'react-navigation'
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 
+import StackReact from '../Component/carousel/StackRect'
 import { Styles } from '../Component/constants/Styles'
 import HeaderNav from '../Component/HeaderNav'
 import Recommendation from '../Component/Recommendation'
@@ -24,41 +25,8 @@ export default class Home extends Component {
     constructor(props) {
         super()
         this.state = {
-            activeSlide: 0, 
-            thisWeekData: [
-                {
-                    shopName: '力生五金',
-                    type: '五金行', 
-                    imageUri: require('../assets/img/KLB_01.jpg'),
-                    text: 'hello1'
-                },
-                {
-                    shopName: 'SHOP',
-                    type: '精品',
-                    imageUri: require('../assets/img/KLB_02.jpg'),
-                    text: 'hello2'
-                },
-                {
-                    shopName: 'The Body Shop',
-                    type: '美容/零售',
-                    imageUri: require('../assets/img/KLB_03.jpg'),
-                    text: 'hello3'
-                },
-                {
-                    shopName: '小店',
-                    type: '零售',
-                    imageUri: require('../assets/img/KLB_04.jpg'),
-                    text: '力生五金'
-                },
-                {
-                    shopName: '雜貨店',
-                    type: '雜貨',
-                    imageUri: require('../assets/img/KLB_05.jpg'),
-                    text: '老式雜貨店, 柴米油鹽醬醋茶芝麻綠豆花膠冬菇'
-                },
-            ]
+
         }
-        this._carousel = null
     }
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.alertDialogBox)
@@ -88,59 +56,6 @@ export default class Home extends Component {
         this.notInFocus()
         this.props.navigation.navigate('Explore')
     }
-    carouselIsClicked = (index) => {
-        if (index == this._carousel.currentIndex)
-            console.log('innnnn')
-        else
-            this._carousel.snapToItem(index)
-    }
-    _renderItem = ({item, index}) => {
-        return (
-            <TouchableOpacity style={Styles.slide}
-                onPress={() => { 
-                //this._carousel.snapToItem(index)
-                this.carouselIsClicked(index)
-              }}
-            >
-                <View style={Styles.card}>
-                    <Image
-                        style={Styles.cardImage}
-                        source={item.imageUri}
-                    />
-                    <View style={Styles.title}>
-                        <Text style={[Styles.cardText, {fontSize: 18}]}>{item.shopName}</Text>
-                        <Text style={Styles.cardText}>
-                            {item.text}
-                        </Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        )
-    }
-    get pagination() {
-        const { thisWeekData, activeSlide } = this.state
-        return (
-            <Pagination
-                dotsLength={thisWeekData.length}
-                activeDotIndex={activeSlide}
-                containerStyle={{ 
-                    backgroundColor: '#333'
-                }}
-                dotStyle={{
-                    width: 5,
-                    height: 5,
-                    borderRadius: 5,
-                    marginHorizontal: 8,
-                    backgroundColor: 'rgba(255, 255, 255, 0.92)'
-                }}
-                inactiveDotStyle={{
-
-                }}
-                inactiveDotOpacity={0.4}
-                inactiveDotScale={0.6}
-            />
-        )
-    }
     render() {
         const screenWidth = Dimensions.get('window').width
         return(
@@ -168,24 +83,7 @@ export default class Home extends Component {
                             Most Wellcome This Week
                         </Text>
                     </LinearGradient>
-                    <View>
-                    <Carousel
-                        ref={(c) => { this._carousel = c }}
-                        data={this.state.thisWeekData}
-                        renderItem={this._renderItem}
-                        sliderWidth={screenWidth}
-                        layout={'stack'}
-                        layoutCardOffset={18}
-                        sliderHeight={300}
-                        itemWidth={screenWidth * 0.7}
-                        itemHeight={256}
-                        firstItem={0}
-                        autoplay={true}
-                        onSnapToItem={(index) => this.setState({ activeSlide: index })}
-                        //onScroll={(index) => console.log(index)}
-                    />
-                    { this.pagination }
-                    </View>
+                    <StackReact paginationBgColor='#333' paginationDotColor='#FFF'/>
                     <Recommendation
                         width={screenWidth}
                         height={200}
