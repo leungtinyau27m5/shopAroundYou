@@ -3,6 +3,8 @@ package com.shoparoundyou;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.imagepicker.ImagePickerPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -32,6 +34,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new PickerPackage(),
+            new ImagePickerPackage(),
             new BackgroundTimerPackage(),
             new AsyncStoragePackage(),
             new RNCWebViewPackage(),

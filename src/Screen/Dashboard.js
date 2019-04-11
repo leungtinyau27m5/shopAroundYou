@@ -9,6 +9,7 @@ import {
     Dimensions,
     ScrollView,
     TouchableOpacity,
+    ToastAndroid,
     Animated
 } from 'react-native'
  import AsyncStorage from '@react-native-community/async-storage'
@@ -21,7 +22,8 @@ import StackReact from '../Component/carousel/StackRect'
 import DefaultRect from '../Component/carousel/DefaultRect'
 import DashboardAll from '../Component/Dashboard/DashboardAll'
 import LoginModal from '../Component/Auth/LoginModal'
-import LoadingScreen from '../Component/LoadingScreen'
+import LogOutModal from '../Component/Auth/LogOutModal'
+import { serverConn } from '../Server/config'
 
 //import Settings from '../Component/Dashboard/Settings'
 
@@ -33,12 +35,7 @@ export default class Dashboard extends Component {
     constructor(props) {
         super()
         this.state = {
-            personalData: {
-                username: null,
-                image: null,
-                cid: null,
-                token: null,
-            },
+            personalData: null,
             buttons: {
                 login: true,
                 register: true
@@ -47,7 +44,9 @@ export default class Dashboard extends Component {
                 cy: 900
             },
             loginModal: false,
+            logoutModal: false,
             isLoading: false,
+            usernameIsValid: false,
             scrollY: new Animated.Value(0)
         }
         this._getPersonalData()
@@ -59,11 +58,12 @@ export default class Dashboard extends Component {
         BackHandler.removeEventListener('hardwareBackPress', this.backToHomeScreen)
     }
     _getPersonalData = async() => {
-        let personalData = await AsyncStorage.getItem('personalData')
-        if (personalData !== null)
-            personalData = JSON.parse(personalData)
+        let temp = await AsyncStorage.getItem('personalData')
+        temp = JSON.parse(temp)
         this.setState({
-            personalData: personalData
+            personalData: temp
+        }, () => {
+            console.log(this.state.personalData)
         })
     }
     sceneIsFocus = () => {
@@ -79,16 +79,159 @@ export default class Dashboard extends Component {
             loginModal: !prevState.loginModal
         }))
     }
-    userLogin = () => {
-        this.showLoginModal()
+    showLogOutModal = () => {
+        this.setState((prevState) => ({
+            logoutModal: !prevState.logoutModal
+        }))
+    }
+    checkDuplicate = (username) => {
+        const data = {
+            request: 'checkUsername',
+            username: username
+        }
+        let result = false
+        console.log(data)
+        fetch(serverConn.serverUri, {
+            method: 'POST',
+            header: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        //.then((response) => console.log(response))
+        .then((response) => response.json())
+        .then(responseData => {
+            ToastAndroid.show('username valid checking connected', ToastAndroid.SHORT)
+            this.setState({
+                usernameIsValid: true
+            })
+        })
+        .catch((error) => {
+            console.log(error)
+            ToastAndroid.show('username valid checking connection failed', ToastAndroid.LONG)
+        })
+        .done(() => { 
+            //console.log('username valid', result)
+            //return result
+        })
+        //return result
+    }
+    customerRegister = async(content) => {
         this.setState({
             isLoading: true
         })
-        const jobDone = backgroundTimer.setTimeout(() => {
+        this.checkDuplicate(content.regUsername)
+        const loading = backgroundTimer.setTimeout(() => {
+            if (this.state.usernameIsValid) {
+                const data = {
+                    request: 'registerCustomer',
+                    username: content.regUsername,
+                    password: content.regPassword,
+                    email: content.regEmail,
+                    phoneNumber: content.regPhoneNumber,
+                    birthday: content.regBirthday,
+                    myIcon: content.regIcon
+                }
+                console.log('ready to fetch data', data.myIcon)
+                /*
+                console.log('it is going to connect', data)
+                fetch(serverConn.serverUri, {
+                    method: 'POST',
+                    header: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                //.then((response) => console.log(response))
+                .then((response) => response.json())
+                .then(responseData => {
+                    if (responseData) {
+                        ToastAndroid.show('Register success', ToastAndroid.SHORT)
+                        this.setState({
+                            isLoading: false
+                        }, () => {
+                            this.userLogin(false, content.regUsername, content.regPassword, true)
+                            this.props.navigation.navigate('Home')
+                        })
+                    } else {
+                        ToastAndroid.show('repeated username', ToastAndroid.SHORT)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                    ToastAndroid.show('Register connection failed', ToastAndroid.LONG)
+                })
+                .done(() => {
+                    this.setState({
+                        isLoading: false
+                    })
+                })*/
+            }
+        }, 5000)
+    }
+    userLogout = async() => {
+        this.setState({
+            isLoading: true
+        })
+        await AsyncStorage.removeItem('personalData')
+        const backgroundCounter = backgroundTimer.setTimeout(() => {
             this.setState({
-                isLoading: false
+                isLoading: false,
+                personalData: null
             })
         }, 2000)
+        this.showLogOutModal()
+        this.props.navigation.navigate('Home')
+    }
+    userLogin = (isLabour, un, pw, isRemember) => {
+        this.setState({
+            isLoading: true
+        })
+        const data = {
+            request: 'login',
+            userType: isLabour ? 'labour' : 'customer',
+            username: un,
+            password: pw,
+            isRemember: isRemember ? true : false,
+        }
+        console.log(data);
+        fetch(serverConn.serverUri, {
+            method: 'POST',
+            header: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        //.then((response) => console.log(response))
+        .then((response) => response.json())
+        .then(responseData => {
+            ToastAndroid.show('Request Succeed', ToastAndroid.SHORT)
+            this._storeData(responseData)
+        })
+        .catch((error) => {
+            console.log(error)
+            ToastAndroid.show('Fetch Request Failed', ToastAndroid.LONG)
+        })
+        .done(() => { 
+            this.setState({ isLoading: false })
+            this.showLoginModal()
+            this.props.navigation.navigate('Home')
+        })
+    }
+    _storeData = async(res) => {
+        const personalData = {
+            username: res.username,
+            userType: res.userType,
+            token: res.token
+        }
+        this.setState({
+            personalData: personalData
+        })
+        await AsyncStorage.setItem('personalData', JSON.stringify(personalData))
+        //console.log(await AsyncStorage.getItem('personalData'))
     }
     render() {
         const screenWidth = Dimensions.get('window').width
@@ -128,13 +271,14 @@ export default class Dashboard extends Component {
             outputRange: [0, 1],
             extrapolate: 'clamp'
         })
+        //this._getPersonalData()
         return (
             <View>
                 <NavigationEvents 
                 onDidFocus={()=> this.sceneIsFocus()}/>
                 <Spinner
                     visible={this.state.isLoading}
-                    textContent={'Logging in ... '}
+                    textContent={'Loading .... '}
                     textStyle={{fontSize: 20, color: '#333'}}
                     color={'#333'}
                 />
@@ -154,10 +298,15 @@ export default class Dashboard extends Component {
                     </View>
                     <Animated.View style={{ width: '100%', position: 'absolute', alignItems: 'center', bottom: headerTitleBottom}}>
                         <TouchableOpacity
-                            onPress={() => this.showLoginModal()}
+                            onPress={() => {
+                                if (this.state.personalData == null)
+                                    this.showLoginModal()
+                                else
+                                    this.showLogOutModal()
+                            }}
                         >
                             <Text style={{ color: '#F6F6F6', fontSize: 14, fontWeight: 'bold'}}>
-                                {this.state.username == null ? 'Touch me to login' : this.state.username}
+                                {this.state.personalData == null ? 'Touch me to login' : this.state.personalData.username}
                             </Text>
                         </TouchableOpacity>
                     </Animated.View>
@@ -173,7 +322,12 @@ export default class Dashboard extends Component {
                     )}
                 >
                     <TouchableOpacity
-                        onPress={() => this.showLoginModal()}
+                        onPress={() => {
+                            if (this.state.personalData == null)
+                                this.showLoginModal()
+                            else 
+                                this.showLogOutModal()
+                        }}
                     >
                     <Animated.View style={{
                         //flex: 1,
@@ -198,7 +352,7 @@ export default class Dashboard extends Component {
                     <View>
                         <Text style={{ 
                         color: '#000', fontWeight: 'bold', fontSize: 18, paddingLeft: 10}}>
-                            {this.state.username == null ? 'Touch me to login' : this.state.username}
+                            {this.state.personalData == null ? 'Touch me to login' : this.state.personalData.username}
                         </Text>
                     </View>
                     <View>
@@ -234,6 +388,17 @@ export default class Dashboard extends Component {
                     <LoginModal 
                         showLoginModal={this.showLoginModal}
                         userLogin={this.userLogin}
+                        customerRegister={this.customerRegister}
+                    />
+                </Modal>
+                <Modal
+                    isVisible={this.state.logoutModal}
+                    onBackdropPress={() => this.showLogOutModal()}
+                    onBackButtonPress={() => { this.setState({ logoutModal: false })}}
+                >
+                    <LogOutModal
+                        userLogout={this.userLogout}
+                        showLogOutModal={this.showLogOutModal}
                     />
                 </Modal>
             </View>

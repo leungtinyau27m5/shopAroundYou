@@ -13,10 +13,9 @@ import { WebView } from 'react-native-webview'
 import {NavigationEvents} from 'react-navigation'
 import AsyncStorage from '@react-native-community/async-storage';
 
-import { serverConn } from '../../queryData/server'
+import { serverConn } from '../Server/config'
 import { geolocation } from '../Component/Auth/Permission'
 
-import { Styles } from '../Component/constants/Styles'
 import HeaderNav from '../Component/HeaderNav'
 import DefaultRect from '../Component/carousel/DefaultRect'
 

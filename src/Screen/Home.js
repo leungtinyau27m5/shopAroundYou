@@ -14,10 +14,9 @@ import {
 import BackgroundTimer from 'react-native-background-timer'
 import LinearGradient from 'react-native-linear-gradient'
 import {NavigationEvents} from 'react-navigation'
-import Carousel, { Pagination } from 'react-native-snap-carousel';
+import AsyncStorage from '@react-native-community/async-storage'
 
 import StackReact from '../Component/carousel/StackRect'
-import { Styles } from '../Component/constants/Styles'
 import HeaderNav from '../Component/HeaderNav'
 import Recommendation from '../Component/Recommendation'
 
@@ -25,14 +24,24 @@ export default class Home extends Component {
     constructor(props) {
         super()
         this.state = {
-
+            personalData: null
         }
+        this._getData()
     }
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.alertDialogBox)
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.alertDialogBox)
+    }
+    _getData = async() => {
+        let temp = await AsyncStorage.getItem('personalData')
+        temp = JSON.parse(temp)
+        this.setState({
+            personalData: temp
+        }, () => {
+            //console.log(this.state.personalData)
+        })
     }
     sceneIsFocus = () => {
         BackHandler.addEventListener('hardwareBackPress', this.alertDialogBox)

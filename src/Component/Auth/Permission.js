@@ -5,7 +5,51 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from 'react-native-geolocation-service'
+import ImagePicker from 'react-native-image-picker'
+import ImageCropPicker from 'react-native-image-crop-picker'
+const options = {
+    ititle: 'select your icon',
+    storageOptions: {
+        skipBackup: true,
+        path: 'images',
+    }
+}
+export let iconUri = null
+export const imagePicker = async() => {
+    try{
+    ImagePicker.showImagePicker(options, (response) => {
+        if (response.didCancel) {
+            //ToastAndroid.show('Image picker is closed', ToastAndroid.SHORT)
+        } else if (response.error) {
+            ToastAndroid.show('permission is not granted', ToastAndroid.SHORT)
+        } else {
+            const source = { uri: response.uri }
+            cropImage(source)        
+        }
+    }, () => {
+    }).catch((err) => {
 
+    })
+    } catch (error) {
+        
+    }
+}
+export const cropImage = async(source) => {
+    try {
+        ImageCropPicker.openCropper({
+            path: source.uri,
+            width: 400,
+            height: 400
+        }).then(async(image) => {
+            await AsyncStorage.setItem('myIcon', image.path)
+            iconUri = image
+        }).catch(() => {
+
+        })
+    } catch (err) {
+
+    }
+}
 export const geolocation = async() => {
     try {
         const granted = await PermissionsAndroid.request(
