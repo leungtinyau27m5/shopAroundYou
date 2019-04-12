@@ -79,14 +79,6 @@ export default class LoginModal extends Component {
         let imageUri;
         const bgTimer = BackgroundTimer.setTimeout(async() => {
             imageUri = await AsyncStorage.getItem('myIcon')
-            const uriPart = imageUri.split('.')
-            const fileExtension = uriPart[uriPart.length - 1]
-            const randomName = Math.random().toString(36).substring(7)
-            const imageDetail = {
-                uri: imageUri,
-                name: `${randomName}.${fileExtension}`,
-                type: `image/${fileExtension}`
-            }
             this.setState({
                 regIcon: imageUri
             }, () => {
@@ -121,7 +113,6 @@ export default class LoginModal extends Component {
             regIcon: this.state.regIcon
         }
         let isGoingOn = false
-        //console.log('login page', content)
         
         let reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         let msg = ''

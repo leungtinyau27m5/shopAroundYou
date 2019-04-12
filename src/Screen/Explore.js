@@ -12,18 +12,24 @@ import {
 import { WebView } from 'react-native-webview'
 import {NavigationEvents} from 'react-navigation'
 import AsyncStorage from '@react-native-community/async-storage';
+import Modal from 'react-native-modal'
+import Spinner from 'react-native-loading-spinner-overlay'
+import BackgroundTimer from 'react-native-background-timer'
 
 import { serverConn } from '../Server/config'
 import { geolocation } from '../Component/Auth/Permission'
 
 import HeaderNav from '../Component/HeaderNav'
-import DefaultRect from '../Component/carousel/DefaultRect'
+import ExCarousel from './Explore/ExCarousel'
+import Filter from '../Component/Explore/Filter'
 
 export default class Explore extends Component {
     constructor(props) {
         super()
         this.state = {
+            isLoading: false,
             geolocation: null,
+            filterModalIsVisible: false,
         }
         this.googleMap = null
         geolocation()
@@ -48,8 +54,28 @@ export default class Explore extends Component {
             text: 'asdf'
         })
     }
-    filterResult = () => {
-        
+    showFilterModal = () => {
+        this.setState((prevState) => ({
+            filterModalIsVisible: !prevState.filterModalIsVisible
+        }))
+    }
+    doFiltering = (filterItems) => {
+        this.setState({
+            isLoading: true
+        })
+        this.locateMyPosition()
+        const counter = BackgroundTimer.setTimeout(() => {
+            const request = {
+                requestType: 'filterShops',
+                details: filterItems
+            }
+            this.googleMap.postMessage(JSON.stringify(request))
+            this.setState({
+                isLoading: false   
+            }, () => {
+                this.showFilterModal()
+            })
+        }, 5000)
     }
     locateMyPosition = async() => {
         if (this.state.geolocation == null) {
@@ -88,8 +114,14 @@ export default class Explore extends Component {
             <View style={{height: '100%'}}>
                 <NavigationEvents 
                 onDidFocus={()=> this.sceneIsFocus()}/>
+                <Spinner
+                    visible={this.state.isLoading}
+                    textContent={'Loading .... '}
+                    textStyle={{fontSize: 20, color: '#333'}}
+                    color={'#333'}
+                />
                 <HeaderNav
-                    filterResult={this.filterResult}
+                    filterResult={this.showFilterModal}
                     locateMyPosition={this.locateMyPosition}
                     //searchScreen={this.onSearch}
                 />
@@ -105,8 +137,20 @@ export default class Explore extends Component {
                     />
                 </View>
                 <View style={[{flex: 1}, this.state.geolocation !== null ? {display: 'flex'} : {display: 'none'}]}>
-                    <DefaultRect />
+                    <ExCarousel 
+                    
+                    />
                 </View>
+                <Modal
+                    isVisible={this.state.filterModalIsVisible} 
+                    onBackdropPress={() => this.showFilterModal()}
+                    onBackButtonPress={() => {this.setState({ filterModalIsVisible: false })}}
+                >
+                    <Filter
+                        doFiltering={this.doFiltering}
+                        showFilterModal={this.showFilterModal}
+                    />
+                </Modal>
             </View>
         )
     }

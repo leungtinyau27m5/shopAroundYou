@@ -124,6 +124,14 @@ export default class Dashboard extends Component {
         this.checkDuplicate(content.regUsername)
         const loading = backgroundTimer.setTimeout(() => {
             if (this.state.usernameIsValid) {
+                const uriPart = content.regIcon.split('.')
+                const fileExtension = uriPart[uriPart.length - 1]
+                const randomName = Math.random().toString(36).substring(7)
+                const imageDetail = {
+                    uri: content.regIcon,
+                    name: `${randomName}.${fileExtension}`,
+                    type: `image/${fileExtension}`
+                }
                 const data = {
                     request: 'registerCustomer',
                     username: content.regUsername,
@@ -131,22 +139,31 @@ export default class Dashboard extends Component {
                     email: content.regEmail,
                     phoneNumber: content.regPhoneNumber,
                     birthday: content.regBirthday,
-                    myIcon: content.regIcon
                 }
-                console.log('ready to fetch data', data.myIcon)
-                /*
-                console.log('it is going to connect', data)
+                let body = new FormData()
+                body.append('request', data.request)
+                body.append('password', data.password)
+                body.append('username', data.username)
+                body.append('email', data.email)
+                body.append('phoneNumber', data.phoneNumber)
+                body.append('birthday', data.birthday)
+                body.append('image', {
+                    uri: imageDetail.uri,
+                    name: imageDetail.name,
+                    type: imageDetail.type
+                })
                 fetch(serverConn.serverUri, {
                     method: 'POST',
                     header: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'multipart/form-data',
                     },
-                    body: JSON.stringify(data)
+                    body: body
                 })
                 //.then((response) => console.log(response))
                 .then((response) => response.json())
                 .then(responseData => {
+                    console.log('checking ', responseData)
                     if (responseData) {
                         ToastAndroid.show('Register success', ToastAndroid.SHORT)
                         this.setState({
@@ -167,7 +184,11 @@ export default class Dashboard extends Component {
                     this.setState({
                         isLoading: false
                     })
-                })*/
+                })
+                //
+                this.setState({
+                    isLoading: false
+                })
             }
         }, 5000)
     }
@@ -196,7 +217,6 @@ export default class Dashboard extends Component {
             password: pw,
             isRemember: isRemember ? true : false,
         }
-        console.log(data);
         fetch(serverConn.serverUri, {
             method: 'POST',
             header: {
@@ -225,8 +245,10 @@ export default class Dashboard extends Component {
         const personalData = {
             username: res.username,
             userType: res.userType,
-            token: res.token
+            token: res.token,
+            myIcon: res.imageUri
         }
+        console.log(personalData)
         this.setState({
             personalData: personalData
         })
@@ -345,7 +367,7 @@ export default class Dashboard extends Component {
                                 width: profileHeight,
                                 height: profileHeight
                             }}
-                            source={require('../assets/img/user.png')} 
+                            source={this.state.personalData == null ? require('../assets/img/user.png') : {uri: `${serverConn.serverAssets}customers/${this.state.personalData.myIcon}`}} 
                         />
                     </Animated.View>
                     </TouchableOpacity>

@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import StackReact from '../Component/carousel/StackRect'
 import HeaderNav from '../Component/HeaderNav'
 import Recommendation from '../Component/Recommendation'
+import { serverConn } from '../../queryData/server';
 
 export default class Home extends Component {
     constructor(props) {
@@ -37,11 +38,39 @@ export default class Home extends Component {
     _getData = async() => {
         let temp = await AsyncStorage.getItem('personalData')
         temp = JSON.parse(temp)
+        if (temp == null) return 
         this.setState({
             personalData: temp
         }, () => {
-            //console.log(this.state.personalData)
+            console.log(this.state.personalData)
         })
+        /*
+        const data = {
+            request: 'CheckAuthToken',
+            token: temp.token,
+            userType: temp.userType
+        }
+        fetch(serverConn.serverUri, {
+            method: 'POST',
+            header: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then((response) => response.json())
+        .then(responseData => {
+            console.log(responseData)
+            if (responseData) {
+                this.setState({
+                    personalData: temp
+                }, () => {
+                    console.log(this.state.personalData)
+                })
+            } else {
+                ToastAndroid.show('Token checking is failed! Please Login Again', ToastAndroid.LONG)
+            }
+        })*/
     }
     sceneIsFocus = () => {
         BackHandler.addEventListener('hardwareBackPress', this.alertDialogBox)
