@@ -30,6 +30,8 @@ export default class Explore extends Component {
             isLoading: false,
             geolocation: null,
             filterModalIsVisible: false,
+            firstTime: true,
+            isShowShop: false
         }
         this.googleMap = null
         geolocation()
@@ -49,7 +51,8 @@ export default class Explore extends Component {
         return true
     }
     addMessage(msg) {
-        console.log('hellllllo')
+        console.log(msg)
+        //console.log('hellllllo')
         this.setState({
             text: 'asdf'
         })
@@ -63,19 +66,26 @@ export default class Explore extends Component {
         this.setState({
             isLoading: true
         })
-        this.locateMyPosition()
+        console.log(filterItems.myAddress == null)
+        /*
+        if (filterItems.myAddress == null) 
+            if (this.state.firstTime)
+                this.locateMyPosition()*/
         const counter = BackgroundTimer.setTimeout(() => {
             const request = {
                 requestType: 'filterShops',
                 details: filterItems
             }
+            console.log('my request to filter items', request)
             this.googleMap.postMessage(JSON.stringify(request))
             this.setState({
-                isLoading: false   
+                isLoading: false,
+                firstTime: false,
+                isShowShop: true
             }, () => {
                 this.showFilterModal()
             })
-        }, 5000)
+        }, 2000)
     }
     locateMyPosition = async() => {
         if (this.state.geolocation == null) {
@@ -85,7 +95,8 @@ export default class Explore extends Component {
             else 
                 ToastAndroid('Location Permission is not granted')
             this.setState({
-                geolocation: location
+                geolocation: location,
+                isShowShop: true
             }, () => {
                 const request = {
                     requestType: 'myLocation',
@@ -136,7 +147,7 @@ export default class Explore extends Component {
                         }}
                     />
                 </View>
-                <View style={[{flex: 1}, this.state.geolocation !== null ? {display: 'flex'} : {display: 'none'}]}>
+                <View style={[{flex: 1}, this.state.isShowShop !== false ? {display: 'flex'} : {display: 'none'}]}>
                     <ExCarousel 
                     
                     />
@@ -149,6 +160,7 @@ export default class Explore extends Component {
                     <Filter
                         doFiltering={this.doFiltering}
                         showFilterModal={this.showFilterModal}
+                        locateMyPosition={this.locateMyPosition}
                     />
                 </Modal>
             </View>

@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 
 import StackReact from '../Component/carousel/StackRect'
 import HeaderNav from '../Component/HeaderNav'
-import Recommendation from '../Component/Recommendation'
+//import Recommendation from '../Component/Recommendation'
 import { serverConn } from '../../queryData/server';
 
 export default class Home extends Component {
@@ -122,17 +122,19 @@ export default class Home extends Component {
                         </Text>
                     </LinearGradient>
                     <StackReact paginationBgColor='#333' paginationDotColor='#FFF'/>
-                    <Recommendation
-                        width={screenWidth}
-                        height={200}
-                        title={'Popular'}
-                        target='popular_products'
-                    />
                 </ScrollView>
             </View>
         )
     }
 }
+/*
+<Recommendation
+                        width={screenWidth}
+                        height={200}
+                        title={'Popular'}
+                        target='popular_products'
+                    />
+*/
 const styled = StyleSheet.create({
     titleContainer: {
         paddingVertical: 10

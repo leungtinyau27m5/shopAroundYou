@@ -9,10 +9,14 @@ import {
     Dimensions,
     TouchableOpacity,
     Picker,
-    TextInput
+    TextInput,
+    ScrollView
 } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 import RNPickerSelect from 'react-native-picker-select'
+import { Fumi } from 'react-native-textinput-effects'
+import AsyncStorage from '@react-native-community/async-storage';
 
 const rangeM = [
     { label: '<500m', value: 500 },
@@ -20,36 +24,69 @@ const rangeM = [
     { label: '<1500m', value: 1500 },
     { label: '<2000m', value: 2000 },
     { label: '<3000m', value: 3000 },
+    { label: '<5000m', value: 5000 },
     { label: 'unlimited', value: 0 }
 ]
 const shopTypes = [
     { label: 'all', value: 0 },
-    { label: 'Tutor', value: 1 },
-    { label: '五金鋪', value: 2 },
-    { label: '通渠', value: 3 }
+    { label: '五金鋪', value: 1 },
+    { label: '零售', value: 2 },
+    { label: '通渠', value: 3 },
+    { label: 'Tutorial', value: 4 }
 ]
 const shopRates = [
     { label: 'all', value: 0 },
-    { label: '1 star', value: 1 },
-    { label: '2 star', value: 2 },
-    { label: '3 star', value: 3 },
-    { label: '4 star', value: 4 },
+    { label: '>1 star', value: 1 },
+    { label: '>2 star', value: 2 },
+    { label: '>3 star', value: 3 },
+    { label: '>4 star', value: 4 },
+    { label: '>5 star', value: 5 },
+]
+const shopPRates = [
+    { label: 'all', value: 0 },
+    { label: '>1 star', value: 1 },
+    { label: '>2 star', value: 2 },
+    { label: '>3 star', value: 3 },
+    { label: '>4 star', value: 4 },
+    { label: '>5 star', value: 5 },
+]
+const shopSRates = [
+    { label: 'all', value: 0 },
+    { label: '>1 star', value: 1 },
+    { label: '>2 star', value: 2 },
+    { label: '>3 star', value: 3 },
+    { label: '>4 star', value: 4 },
     { label: '5 star', value: 5 },
 ]
 export default class Filter extends Component {
     constructor(props) {
         super()
         this.state = {
-            rangeInM: 100,
+            rangeInM: 0,
             shopType: 0,
-            shopRate: 5
+            shopRate: 0,
+            shopPRate: 0,
+            shopSRate: 0,
+            myAddress: null
         }
         this._rangeInMPicker = null
         this._shopType = null
         this._shopRate = null
+        this._shopPRate = null
+        this._shopSRate = null
+
+        this._getFilterItems()
     }
-    prepareData = () => {
+    _getFilterItems = async() => {
+
+    }
+    prepareData = async() => {
+        //await AsyncStorage.setItem('filterItems', JSON.stringify(this.state))
         this.props.doFiltering(this.state)
+    }
+    _locateMyself = () => {
+        this.props.locateMyPosition()
+        this.props.showFilterModal()
     }
     render() {
         const screenWidth = Dimensions.get('window').width
@@ -87,7 +124,49 @@ export default class Filter extends Component {
                         />
                     </TouchableOpacity>
                 </View>
+                <ScrollView>
                 <View style={styles.body}>
+                    <View style={styles.filterItem}>
+                    <TouchableOpacity 
+                        style={{
+                            paddingHorizontal: 10, 
+                            justifyContent: 'center', 
+                            alignItems: 'center',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            paddingVertical: 5
+                        }} 
+                        onPress={() => this._locateMyself()}
+                    >
+                        <Ionicons
+                            name={'ios-locate'}
+                            size={ 28 }
+                            color={'#333'}
+                        />
+                        <Text>My Current Postion</Text>
+                    </TouchableOpacity>
+                    </View>
+                    <View style={styles.filterItem}>
+                        <Fumi
+                            onChangeText={(text) => { this.setState({ myAddress: text })}}
+                            editable={true}
+                            style={{
+                                width: '100%',
+                                marginTop: 10,
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                borderWidth: 1
+                            }}
+                            label={'other address'}
+                            iconClass={FontAwesomeIcon}
+                            iconName={'map-marker'}
+                            iconColor={'#E5E510'}
+                            iconSize={20}
+                            iconWidth={40}
+                            inputPadding={16}
+                            value={this.state.myAddress}
+                        />
+                    </View>
                     <View style={styles.filterItem}>
                         <Text style={styles.filterItemText}>Range (m)</Text>
                         <RNPickerSelect
@@ -160,7 +239,45 @@ export default class Filter extends Component {
                             }}
                         />
                     </View>
-                    <View style={{ marginTop: 25, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={styles.filterItem}>
+                        <Text style={styles.filterItemText}>Shop Product Rating</Text>
+                        <RNPickerSelect
+                            //placeholder={placeholder}
+                            items={shopPRates}
+                            useNativeAndroidPickerStyle={false}
+                            onValueChange={value => {
+                                this.setState({
+                                    shopPRate: value,
+                                });
+                            }}
+                            style={pickerSelectStyles}
+                            value={this.state.shopPRate}
+                            ref={el => {
+                                this._shopPRate = el;
+                            }}
+                        />
+                    </View>
+                    <View style={styles.filterItem}>
+                        <Text style={styles.filterItemText}>Shop Service Rating</Text>
+                        <RNPickerSelect
+                            //placeholder={placeholder}
+                            items={shopSRates}
+                            useNativeAndroidPickerStyle={false}
+                            onValueChange={value => {
+                                this.setState({
+                                    shopSRate: value,
+                                });
+                            }}
+                            style={pickerSelectStyles}
+                            value={this.state.shopSRate}
+                            ref={el => {
+                                this._shopSRate = el;
+                            }}
+                        />
+                    </View>
+                    </View>
+                </ScrollView>
+                    <View style={{ paddingVertical: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         <TouchableOpacity 
                             onPress={() => this.prepareData()}
                             style={[styles.buttons, styles.OnGoingButton]}>
@@ -172,7 +289,6 @@ export default class Filter extends Component {
                             <Text style={styles.buttonText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
             </View>
         )
     }
