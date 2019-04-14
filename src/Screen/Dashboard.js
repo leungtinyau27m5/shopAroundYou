@@ -228,6 +228,7 @@ export default class Dashboard extends Component {
         //.then((response) => console.log(response))
         .then((response) => response.json())
         .then(responseData => {
+            console.log(responseData)
             ToastAndroid.show('Request Succeed', ToastAndroid.SHORT)
             this._storeData(responseData)
         })

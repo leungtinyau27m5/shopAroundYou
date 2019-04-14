@@ -24,6 +24,9 @@ import ExCarousel from './Explore/ExCarousel'
 import Filter from '../Component/Explore/Filter'
 
 export default class Explore extends Component {
+    static navigationOptions = {
+        header: null
+    }
     constructor(props) {
         super()
         this.state = {
@@ -31,7 +34,10 @@ export default class Explore extends Component {
             geolocation: null,
             filterModalIsVisible: false,
             firstTime: true,
-            isShowShop: false
+            isShowShop: false,
+            viewedShopList: [],
+            shopsCarousel: [],
+            shopsDetail: null
         }
         this.googleMap = null
         geolocation()
@@ -51,22 +57,31 @@ export default class Explore extends Component {
         return true
     }
     addMessage(msg) {
-        console.log(msg)
+        this.addShopCarousel(msg)
         //console.log('hellllllo')
         this.setState({
             text: 'asdf'
         })
     }
+    addShopCarousel = (shops) => {
+        if (shops == null) return
+
+        //this.state.shopsCarousel = shops.slice()
+        let data = JSON.parse(shops)
+        this.setState({
+            shopsCarousel: data
+        })
+    }
     showFilterModal = () => {
         this.setState((prevState) => ({
-            filterModalIsVisible: !prevState.filterModalIsVisible
+            filterModalIsVisible: !prevState.filterModalIsVisible,
+            isLoading: false
         }))
     }
     doFiltering = (filterItems) => {
         this.setState({
             isLoading: true
         })
-        console.log(filterItems.myAddress == null)
         /*
         if (filterItems.myAddress == null) 
             if (this.state.firstTime)
@@ -76,10 +91,9 @@ export default class Explore extends Component {
                 requestType: 'filterShops',
                 details: filterItems
             }
-            console.log('my request to filter items', request)
             this.googleMap.postMessage(JSON.stringify(request))
             this.setState({
-                isLoading: false,
+                //isLoading: false,
                 firstTime: false,
                 isShowShop: true
             }, () => {
@@ -119,6 +133,25 @@ export default class Explore extends Component {
     onSearch = () => {
         
     }
+    viewShopAction = (shop) => {
+        BackHandler.removeEventListener('hardwareBackPress', this.backToHomeScreen)
+        this.props.navigation.navigate('ViewShop', {
+            shop: shop
+        })
+    }
+    viewShopOnScroll = (index) => {
+        const location = {
+            lat: this.state.shopsCarousel[index].latitude,
+            lng: this.state.shopsCarousel[index].longitude
+        }
+        const request = {
+            requestType: 'focusOnTheShop',
+            details: {
+                location: location
+            }
+        }
+        this.googleMap.postMessage(JSON.stringify(request))
+    }
     render() {
         const screenWidth = Dimensions.get('window').width
         return (
@@ -149,7 +182,9 @@ export default class Explore extends Component {
                 </View>
                 <View style={[{flex: 1}, this.state.isShowShop !== false ? {display: 'flex'} : {display: 'none'}]}>
                     <ExCarousel 
-                    
+                        data={this.state.shopsCarousel}
+                        viewShopAction={this.viewShopAction}
+                        viewShopOnScroll={this.viewShopOnScroll}
                     />
                 </View>
                 <Modal

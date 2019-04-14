@@ -4,14 +4,24 @@ import {
     Text,
     Button
 } from 'react-native'
-import { createSwitchNavigator } from 'react-navigation'
+import { 
+    createSwitchNavigator,
+    createStackNavigator
+} from 'react-navigation'
 
 import Explore from '../../src/Screen/Explore'
+//import ViewShop from '../../src/Screen/Explores/ViewShop'
+import ViewShop from '../../src/Screen/Explore/ViewShop'
 
-const ExploreSwitchNav = createSwitchNavigator({
+const ExploreSwitchNav = createStackNavigator({
     Explore: {
-        screen: Explore
+        screen: Explore,
+    },
+    ViewShop: {
+        screen: ViewShop
     }
+}, {
+
 })
 
 export default class ExploreSwtich extends Component {

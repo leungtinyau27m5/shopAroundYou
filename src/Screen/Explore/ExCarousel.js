@@ -5,80 +5,76 @@ import {
     StyleSheet,
     TouchableOpacity,
     Dimensions,
-    Image
+    Image,
 } from 'react-native'
 import Carousel from 'react-native-snap-carousel';
 
 import { Styles } from '../../Component/constants/Styles'
+import { serverConn } from '../../Server/config'
+let dataSize = 0
 
 export default class StackReact extends Component {
     constructor(props) {
         super()
         this.state = {
             activeSlide: 0,
-            thisWeekData: [
-                {
-                    shopName: '力生五金',
-                    type: '五金行', 
-                    imageUri: require('../../assets/img/KLB_01.jpg'),
-                    text: 'hello1'
-                },
-                {
-                    shopName: 'SHOP',
-                    type: '精品',
-                    imageUri: require('../../assets/img/KLB_02.jpg'),
-                    text: 'hello2'
-                },
-                {
-                    shopName: 'The Body Shop',
-                    type: '美容/零售',
-                    imageUri: require('../../assets/img/KLB_03.jpg'),
-                    text: 'hello3'
-                },
-                {
-                    shopName: '小店',
-                    type: '零售',
-                    imageUri: require('../../assets/img/KLB_04.jpg'),
-                    text: '力生五金'
-                },
-                {
-                    shopName: '雜貨店',
-                    type: '雜貨',
-                    imageUri: require('../../assets/img/KLB_05.jpg'),
-                    text: '老式雜貨店, 柴米油鹽醬醋茶芝麻綠豆花膠冬菇'
-                },
-            ]
+            thisWeekData: null
         }
         this._carousel = null
     }
-    carouselIsClicked = (index) => {
+    componentDidUpdate() {
+        dataSize = this.props.data.length
+    }
+    carouselIsClicked = (shop, index) => {
         if (index == this._carousel.currentIndex)
-            console.log('innnnn')
+            this.props.viewShopAction(shop)
         else
             this._carousel.snapToItem(index)
+    }
+    _carouselOnScroll = (event) => {
+        const num = Math.floor(event.nativeEvent.contentOffset.x)
+        const screenWidth = Dimensions.get('window').width
+        let index = 0
+        let isChanged = false
+        for (let i = 0; i < dataSize; i++) {
+            if (num <= i * screenWidth) {
+                index = i
+                if (this.state.activeSlide !== index) {
+                    isChanged = true
+                    this.setState({
+                        activeSlide: i
+                    })
+                    i = dataSize
+                }
+            }
+        }
+        if (isChanged)
+            this.props.viewShopOnScroll(index)
     }
     _renderItem = ({item, index}) => {
         return (
             <TouchableOpacity style={Styles.slide}
                 onPress={() => { 
-                this.carouselIsClicked(index)
+                this.carouselIsClicked(item, index)
               }}
             >
                 <View style={Styles.card}>
                     <Image
-                        style={Styles.cardImage}
-                        source={item.imageUri}
+                        style={[Styles.cardImage, {width: '100%', height: 145}]}
+                        source={{uri: `${serverConn.serverAssets}shops/${item.image_uri}`}}
                     />
                     <View style={Styles.title}>
                         <View style={{justifyContent: 'space-between', flexDirection: 'row', paddingHorizontal: 15}}>
-                            <Text style={[Styles.cardText, {fontSize: 18, textDecorationLine: 'underline'}]}>{item.shopName}</Text>
-                            <Text>Rating</Text>
+                            <Text style={[Styles.cardText, {fontSize: 18, textDecorationLine: 'underline'}]}>{item.shop_name}</Text>
+                            <Text style={{
+                                color: '#FFF'
+                            }}>{item.overall_avg}</Text>
                         </View>
                         <Text style={[Styles.cardText, {paddingHorizontal: 15}]}>
-                            {item.text}
+                            {item.description}
                         </Text>
                         <Text style={{marginRight: 'auto', marginLeft: 'auto', fontSize: 12, color: '#FFF'}}>
-                            Shop Owner
+                            {item.formatted_address}
                         </Text>
                     </View>
                 </View>
@@ -86,13 +82,14 @@ export default class StackReact extends Component {
         )
     }
     render() {
-        const { thisWeekData, activeSlide } = this.state
+        let shopDetail = this.props.data
         const screenWidth = Dimensions.get('window').width
         return (
             <View>
                     <Carousel
                         ref={(c) => { this._carousel = c }}
-                        data={this.state.thisWeekData}
+                        //data={this.state.thisWeekData}
+                        data={shopDetail}
                         renderItem={this._renderItem}
                         sliderWidth={screenWidth}
                         //layout={'tinder'}
@@ -101,7 +98,12 @@ export default class StackReact extends Component {
                         itemWidth={screenWidth * 0.7}
                         itemHeight={256}
                         firstItem={0}
-                        //onScroll={(index) => console.log(index)}
+                        useScrollView={true}
+                        pagingEnabled={true}
+                        scrollEventThrottle={16}
+                        onScroll={this._carouselOnScroll}
+                        //onScrollEndDrag={this._carouselOnScroll}
+                        //onScroll={(index) => {console.log('it is on scroll')}}
                     />
             </View>
         )

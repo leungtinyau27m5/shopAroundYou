@@ -1,5 +1,5 @@
 export const serverConn = {
-    //serverUri: 'https://steveleungtest321.000webhostapp.com/Auth.php',
+    //serverUri: 'https://steveleungtest321.000webhostapp.com/',
     //serverGoogleMapUri: 'https://steveleungtest321.000webhostapp.com/Google_Map/googleMap.php',
     //serverAssets: 'https://steveleungtest321.000webhostapp.com/assets/'
     serverUri: 'http://192.168.0.103:80/shopAroundYou/Auth.php',
