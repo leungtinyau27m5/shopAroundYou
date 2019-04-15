@@ -46,6 +46,9 @@ export default class ViewShop extends Component {
     }
     _sceneIsFocus = () => {
         BackHandler.addEventListener('hardwareBackPress', this.backToExplore)
+        if (this.state.shopDetail !== null)
+            if (this.state.shopDetail.shop.merchant_code == this.props.navigation.state.params.shop.merchant_code)
+                return
         this.setState({
             isLoading: true
         })

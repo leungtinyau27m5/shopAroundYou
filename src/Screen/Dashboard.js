@@ -380,6 +380,12 @@ export default class Dashboard extends Component {
                     </View>
                     <View>
                         <DashboardAll personalData={this.state.personalData} />
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewShop', { shop: {merchant_code: 'shop01'} })}>
+                            <Text>Debug Test 01</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('ViewShop', { shop: {merchant_code: 'shop02'} })}>
+                            <Text>Debug Test 02</Text>
+                        </TouchableOpacity>
                         <View style={{ 
                             maringTop: 55,
                             paddingVertical: 15,
