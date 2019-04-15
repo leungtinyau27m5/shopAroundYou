@@ -13,6 +13,7 @@
     "react-native-async-storage": "0.0.1",
     "react-native-background-timer": "^2.1.1",
     "react-native-collapsible": "^1.4.0",
+    "react-native-elements": "^1.1.0",
     "react-native-geolocation": "^1.0.0",
     "react-native-geolocation-service": "^2.0.0",
     "react-native-gesture-handler": "^1.1.0",

@@ -11,14 +11,10 @@ import {
 import LinearGradient from 'react-native-linear-gradient'
 import { serverConn } from '../../../Server/config'
 
-const colorLevel = [
-    '#ffffff', '#ffe6cc', '#ffdab3', '#ffce99', '#ffc180', '#ffb566', '#ffa94d', '#ff9c33', '#ff901a', '#ff8400'
-]
-
-
-export default class Products extends Component {
+export default class Services extends Component {
     render() {
-        const { product } = this.props
+        const { service } = this.props
+        console.log(`${serverConn.serverAssets}${service.image_uri}`)
         return (
             <View style={{
                 
@@ -26,7 +22,7 @@ export default class Products extends Component {
                 <View style={styles.container}>
                     <View style={styles.imageContainer}>
                         <Image
-                            source={{ uri: `${serverConn.serverAssets}${product.image_uri}` }}
+                            source={{ uri: `${serverConn.serverAssets}${service.image_uri}` }}
                             style={{
                                 width: 120,
                                 height: 120
@@ -40,22 +36,23 @@ export default class Products extends Component {
                                     fontSize: 14,
                                     color: '#333'
                                 }}
-                            >{product.pid}</Text>
+                            >{service.pid}</Text>
                             <Text
                                 style={{
                                     fontSize: 18,
                                     color: '#333',
                                     marginLeft: 10
                                 }}
-                            >{product.product_name}</Text>
+                            >{service.s_name}</Text>
                         </View>
                         <View style={styles.content}>
-                            <Text>{product.p_type_name}</Text>
-                            <Text>{product.description}</Text>
+                            <Text>{service.type_description}</Text>
+                            <Text>{service.description}</Text>
                             <View style={{
                                 alignItems: 'flex-end'
                             }}>
-                                <Text>asdf</Text>
+                                <Text>{`$ ${service.price_min}`}</Text>
+                                <Text>{`$ ${service.price_max}`}</Text>
                             </View>
                         </View>
                     </View>

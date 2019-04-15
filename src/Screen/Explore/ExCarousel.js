@@ -61,7 +61,7 @@ export default class StackReact extends Component {
                 <View style={Styles.card}>
                     <Image
                         style={[Styles.cardImage, {width: '100%', height: 145}]}
-                        source={{uri: `${serverConn.serverAssets}shops/${item.image_uri}`}}
+                        source={{uri: `${serverConn.serverAssets}${item.image_uri}`}}
                     />
                     <View style={Styles.title}>
                         <View style={{justifyContent: 'space-between', flexDirection: 'row', paddingHorizontal: 15}}>
@@ -83,6 +83,7 @@ export default class StackReact extends Component {
     }
     render() {
         let shopDetail = this.props.data
+        console.log('ex carousel ', shopDetail)
         const screenWidth = Dimensions.get('window').width
         return (
             <View>

@@ -12,7 +12,12 @@ import {
     ToastAndroid
 } from 'react-native'
 import { NavigationEvents } from 'react-navigation'
-import Product from '../../Component/Product'
+import Spinner from 'react-native-loading-spinner-overlay'
+import backgroundTimer from 'react-native-background-timer'
+//import Product from '../../Component/Product'
+import Products from '../../Component/Explore/viewShop/Products'
+import Services from '../../Component/Explore/viewShop/Services'
+import Labours from '../../Component/Explore/viewShop/Labours'
 
 import { serverConn } from '../../Server/config'
 
@@ -28,18 +33,22 @@ export default class ViewShop extends Component {
             tabs: {
                 isProduct: true,
             },
-            shopDetail: null
+            shopDetail: null,
+            isLoading: false
         }
         this._tabsScrollView = null
     }
     componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.backToExplore)
+
     }
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.backToExplore)
+        
     }
     _sceneIsFocus = () => {
-        console.log(this.props.navigation.state.params.shop)
+        BackHandler.addEventListener('hardwareBackPress', this.backToExplore)
+        this.setState({
+            isLoading: true
+        })
         const data = {
             request: 'viewShopRequest',
             merchant_code: this.props.navigation.state.params.shop.merchant_code
@@ -58,10 +67,18 @@ export default class ViewShop extends Component {
         .then(responseData => {
             console.log(responseData)
             this._storeData(responseData)
+            const bgCounter = backgroundTimer.setTimeout(() => {
+                this.setState({
+                    isLoading: false
+                })
+            }, 1000)
         })
         .catch((error) => {
             console.log(error)
             ToastAndroid.show('shop request failed', ToastAndroid.LONG)
+        })
+        .done(() => {
+            
         })
     }
     _storeData = (responseData) => {
@@ -70,7 +87,7 @@ export default class ViewShop extends Component {
         })
     }
     _sceneIsBlur = () => {
-
+        BackHandler.removeEventListener('hardwareBackPress', this.backToExplore)
     }
     backToExplore = () => {
         BackHandler.removeEventListener('hardwareBackPress', this.backToExplore)
@@ -93,24 +110,160 @@ export default class ViewShop extends Component {
             })
         }
     }
+    _renderProducts = () => {
+        if (this.state.shopDetail == null) return (<View><Text>There is no products</Text></View>)
+
+        let newArr = this.state.shopDetail.products.map((ele, index) => {
+            return (
+                <Products
+                    key={`product-${ele.pid}`}
+                    product={ele}
+                />
+            )
+        })
+        return newArr
+    }
+    _renderServices = () => {
+        if (this.state.shopDetail == null) return(<View><Text>There is no services</Text></View>)
+
+        let newArr = this.state.shopDetail.services.map((ele, index) => {
+            return (
+                <Services
+                    key={`service-${ele.sid}`}
+                    service={ele}
+                />
+            )
+        })
+        return newArr
+    }
+    _renderLabours = () => {
+        if (this.state.shopDetail == null) return (<View><Text>There is no Labours</Text></View>)
+
+            let owner = []
+            let sm = []
+            let m = []
+            let sc = []
+            let c = []
+            let pt = []
+
+        for (let i = 0; i < this.state.shopDetail.labour.length; i++) {
+            const ele = this.state.shopDetail.labour[i]
+            if (ele.position == 'Owner')
+                owner.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position = 'Senior_Manager')
+                sm.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Manager')
+                m.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Senior_Clerk')
+                sc.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Clerk')
+                c.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Part_Time_Clerk')
+                pt.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+        }
+        return (
+            <View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Owner
+                    </Text>
+                    <View style={styles.iconContainer}>{owner}</View>
+                </View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Senior Manager
+                    </Text>
+                    <View style={styles.iconContainer}>{sm}</View>
+                </View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Manager
+                    </Text>
+                    <View style={styles.iconContainer}>{m}</View>
+                </View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Senior Clerk
+                    </Text>
+                    <View style={styles.iconContainer}>{sc}</View>
+                </View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Clerk
+                    </Text>
+                    <View style={styles.iconContainer}>{c}</View>
+                </View>
+                <View style={styles.setCenter}>
+                    <Text style={{fontSize: 18, justifyContent: 'center', alignItems: 'center', textAlign: 'center'}}>
+                        Part time
+                    </Text>
+                    <View style={styles.iconContainer}>{pt}</View>
+                </View>
+            </View>
+        )
+
+        /*
+        let newArr = this.state.shopDetail.labour.map((ele, index) => {
+            let owner
+            let sm
+            let m
+            let sc
+            let c
+            let pt
+            if (ele.position == 'Owner')
+                owner.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position = 'Senior_Manager')
+                sm.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Manager')
+                m.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Senior_Clerk')
+                sc.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Clerk')
+                c.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+            else if (ele.position == 'Part_Time_Clerk')
+                pt.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
+        })
+        return newArr*/
+    }
     render() {
-        console.log(this.state.shopDetail)
+        const { shopDetail } = this.state
+        let shopOwner = null
+        let shopOwnerImage = null
+        let shopImage = null
+        if (shopDetail !== null) {
+            for (let i = 0; i < shopDetail.labour.length; i++) {
+                if (shopDetail.labour[i].position === 'Owner') {
+                    shopOwner = shopDetail.labour[i].username
+                    shopOwnerImage = shopDetail.labour[i].image_uri
+                    i = shopDetail.labour.length
+                    shopImage = shopDetail.shop.image_uri
+                }
+            }
+        }
         return (
             <View>
                 <NavigationEvents 
                     onDidBlur={() => this._sceneIsBlur()}
                     onDidFocus={() => this._sceneIsFocus()}/>
+                <Spinner
+                    visible={this.state.isLoading}
+                    textContent={'Loading .... '}
+                    textStyle={{fontSize: 20, color: '#333'}}
+                    color={'#333'}
+                />
                 <ScrollView>
                     <View style={styles.headerImage}>
                         <ImageBackground
-                            source={require('../../assets/img/KLB_01.jpg')}
+                            //source={require('../../assets/img/KLB_01.jpg')}
+                            source={{ uri: `${serverConn.serverAssets}${shopImage}` }}
                             style={{width: '100%', height: 180}}
                             resizeMode='cover'
                         >
                         </ImageBackground>
                         <View style={styles.shopOwnerIcon}>
                             <Image
-                                source={require('../../assets/img/user.png')}
+                                //source={require('../../assets/img/user.png')}
+                                source={{ uri: `${serverConn.serverAssets}${shopOwnerImage}` }}
                                 style={{width: 100, height: 100, zIndex: 9}}
                             />
                         </View>
@@ -119,8 +272,16 @@ export default class ViewShop extends Component {
                         flexDirection: 'row',
                         justifyContent: 'space-between'
                     }]}>
-                        <Text style={styles.titleText}>Shop Name</Text>
-                        <Text style={{fontSize: 15, textDecorationLine: 'underline'}}>Shop Owner</Text>
+                        <Text style={styles.titleText}>
+                        {
+                            shopDetail !== null ? shopDetail.shop.shop_name : ''
+                        }
+                        </Text>
+                        <Text style={{fontSize: 15, textDecorationLine: 'underline'}}>
+                        {
+                            shopOwner !== null ? shopOwner : ''
+                        }
+                        </Text>
                     </View>
                     <View style={[styles.container]}>
                         <View style={{
@@ -130,7 +291,9 @@ export default class ViewShop extends Component {
                             borderWidth: 2,
                             minHeight: 150
                         }}>
-                            <Text>Description</Text>
+                            <Text>
+                                {shopDetail !== null ? shopDetail.shop.description : ''}
+                            </Text>
                         </View>
                     </View>
                     <View style={[styles.container]}>
@@ -138,17 +301,42 @@ export default class ViewShop extends Component {
                             flexDirection: 'row',
                         }}>
                             <TouchableOpacity 
-                            onPress={() => { this.setState((prevState) => ({ tabs: { isProduct: !prevState.tabs.isProduct } })) }}
+                            onPress={() => { 
+                                this.setState((prevState) => ({ 
+                                    tabs: { 
+                                        isProduct: !prevState.tabs.isProduct 
+                                    } 
+                                }))
+                                this._tabsScrollView.scrollTo({
+                                    x: 0,
+                                    y: 0,
+                                    animated: true
+                                })
+                            }}
                             style={[styles.tabsButton, this.state.tabs.isProduct ? styles.tabIsOn : styles.tabIsOff]}>
                                 <Text style={[styles.tabsText, this.state.tabs.isProduct ? styles.tabIsOn : styles.tabIsOff]}>Products</Text>
                             </TouchableOpacity>
                             <TouchableOpacity 
-                            onPress={() => { this.setState((prevState) => ({ tabs: { isProduct: !prevState.tabs.isProduct } })) }}
+                            onPress={() => { 
+                                this.setState((prevState) => ({ 
+                                    tabs: { 
+                                        isProduct: !prevState.tabs.isProduct 
+                                    } 
+                                })) 
+                                this._tabsScrollView.scrollTo({
+                                    x: screenWidth,
+                                    y: 0,
+                                    animated: true
+                                })
+                            }}
                             style={[styles.tabsButton, !this.state.tabs.isProduct ? styles.tabIsOn : styles.tabIsOff]}>
                                 <Text style={[styles.tabsText, !this.state.tabs.isProduct ? styles.tabIsOn : styles.tabIsOff]}>Services</Text>
                             </TouchableOpacity>
                         </View>
                         <ScrollView
+                            ref={(ref) => {
+                                this._tabsScrollView = ref
+                            }}
                             horizontal={true}
                             pagingEnabled={true}
                             showsHorizontalScrollIndicator={true}
@@ -159,19 +347,12 @@ export default class ViewShop extends Component {
                             <View
                                 style={styles.scrollViewPage}
                             >
-                                <View style={{
-                                    width: screenWidth,
-                                    height: 200,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}>
-
-                                </View>
+                                {this._renderProducts()}
                             </View>
                             <View
                                 style={styles.scrollViewPage}
                             >
-                                <Text>qwer</Text>
+                                {this._renderServices()}
                             </View>
                         </ScrollView>
                     </View>
@@ -186,7 +367,20 @@ export default class ViewShop extends Component {
 
                     </View>
                     <View style={styles.container}>
-                    
+                        <Text style={[styles.titleText, {
+                                marginLeft: 'auto', 
+                                justifyContent: 'center', 
+                                marginRight: 'auto'
+                        }]}>
+                            Labours
+                        </Text>
+                        <View style={{
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                        }}>
+                            {this._renderLabours()}
+                        </View>
                     </View>
                 </ScrollView>    
             </View>
@@ -240,7 +434,15 @@ const styles = StyleSheet.create({
         color: '#757575'
     },
     scrollViewPage: {
-        width: screenWidth,
-        minHeight: 300
+        width: screenWidth - 30,
+    },
+    setCenter: {
+        justifyContent: 'center',
+        marginTop: 20
+    },
+    iconContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
     }
 })
