@@ -8,7 +8,8 @@ import {
     StyleSheet,
     ToastAndroid,
     Switch,
-    ScrollView
+    ScrollView,
+    PermissionsAndroid,
 } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
@@ -17,9 +18,18 @@ import { Fumi } from 'react-native-textinput-effects'
 import { Checkbox } from 'react-native-paper'
 import DateTimePicker from 'react-native-modal-datetime-picker'
 import BackgroundTimer from 'react-native-background-timer'
-import { imagePicker, iconUri } from '../Auth/Permission'
 import AsyncStorage from '@react-native-community/async-storage';
+import ImagePicker from 'react-native-image-picker'
+import ImageCropPicker from 'react-native-image-crop-picker'
 
+let changedImage = false
+const options = {
+    ititle: 'select your icon',
+    storageOptions: {
+        skipBackup: true,
+        path: 'images',
+    }
+}
 export default class LoginModal extends Component {
     constructor(props) {
         super()
@@ -38,12 +48,13 @@ export default class LoginModal extends Component {
             regBirthday: null,
             regIcon: null,
         }
+        this._bgTimer = null
     }
     componentDidMount() {
 
     }
     componentWillUnmount() {
-
+        BackgroundTimer.clearInterval(this._bgTimer)
     }
     _handleToggleSwitch = () => {
         this.setState((prevState) => ({
@@ -71,20 +82,63 @@ export default class LoginModal extends Component {
             })
         }
     }
-    _userIcon = () => {
-        imagePicker()       
-        this.changeIcon() 
+    _imagePicker = async() => {
+        try{
+            ImagePicker.showImagePicker(options, (response) => {
+                if (response.didCancel) {
+                    //ToastAndroid.show('Image picker is closed', ToastAndroid.SHORT)
+                } else if (response.error) {
+                    ToastAndroid.show('permission is not granted', ToastAndroid.SHORT)
+                } else {
+                    const source = { uri: response.uri }
+                    this._cropImage(source)        
+                }
+            }, () => {
+            }).catch((err) => {
+        
+            })
+            } catch (error) {
+                
+            }
     }
-    changeIcon = async() => {
-        let imageUri;
-        const bgTimer = BackgroundTimer.setTimeout(async() => {
-            imageUri = await AsyncStorage.getItem('myIcon')
+    _cropImage = async(source) => {
+        try {
+            return new Promise((resolve, reject) => {
+                ImageCropPicker.openCropper({
+                    path: source.uri,
+                    width: 400,
+                    height: 400
+                }).then(async(image) => {
+                    await AsyncStorage.setItem('myIcon', image.path)
+                    this.changeIcon(image)
+                }).catch(() => {
+    
+                })
+            })
+        } catch (err) {
+    
+        }
+    }
+    _userIcon = () => {
+        this._imagePicker()
+        /*
+        let promise = new Promise(function(resolve, reject) {
+            imagePicker()
+            resolve(true)
+        })
+        promise.then(() => this.changeIcon())*/
+    }
+    changeIcon = async(image) => {
+        //let imageUri;
+        //this._bgTimer = BackgroundTimer.setTimeout(async() => {
+            //imageUri = await AsyncStorage.getItem('myIcon')
             this.setState({
-                regIcon: imageUri
+                //regIcon: imageUri
+                regIcon: image.path
             }, () => {
                 console.log(this.state.regIcon)
             })
-        }, 5000)
+        //}, 5000)
     }
     _userlogin = () => {
         let formCompleted = true
@@ -126,6 +180,8 @@ export default class LoginModal extends Component {
             msg += 'invalid phone number'
         else if (content.regBirthday == null)
             msg += 'birthday cant be null'
+        else if (content.regIcon == null)
+            msg += 'Icon cant be null'
         else 
             isGoingOn = true
         
