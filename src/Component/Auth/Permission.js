@@ -36,15 +36,17 @@ export const imagePicker = async() => {
 }
 export const cropImage = async(source) => {
     try {
-        ImageCropPicker.openCropper({
-            path: source.uri,
-            width: 400,
-            height: 400
-        }).then(async(image) => {
-            await AsyncStorage.setItem('myIcon', image.path)
-            iconUri = image
-        }).catch(() => {
+        return new Promise((resolve, reject) => {
+            ImageCropPicker.openCropper({
+                path: source.uri,
+                width: 400,
+                height: 400
+            }).then(async(image) => {
+                await AsyncStorage.setItem('myIcon', image.path)
+                iconUri = image
+            }).catch(() => {
 
+            })
         })
     } catch (err) {
 
