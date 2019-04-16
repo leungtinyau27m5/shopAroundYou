@@ -68,7 +68,7 @@ export default class ViewShop extends Component {
         //.then((response) => console.log(response))
         .then((response) => response.json())
         .then(responseData => {
-            console.log(responseData)
+            //console.log(responseData)
             this._storeData(responseData)
             const bgCounter = backgroundTimer.setTimeout(() => {
                 this.setState({
@@ -115,7 +115,7 @@ export default class ViewShop extends Component {
     }
     _renderProducts = () => {
         if (this.state.shopDetail == null) return (<View><Text>There is no products</Text></View>)
-
+        //console.log('comments', this.state.shopDetail.product_comments)
         let newArr = this.state.shopDetail.products.map((ele, index) => {
             return (
                 <Products

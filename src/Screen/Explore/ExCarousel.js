@@ -83,7 +83,7 @@ export default class StackReact extends Component {
     }
     render() {
         let shopDetail = this.props.data
-        console.log('ex carousel ', shopDetail)
+        //console.log('ex carousel ', shopDetail)
         const screenWidth = Dimensions.get('window').width
         return (
             <View>
