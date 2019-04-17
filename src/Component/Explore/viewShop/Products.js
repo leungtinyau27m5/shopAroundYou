@@ -44,7 +44,8 @@ export default class Products extends Component {
         }), async() => {
             let status = {
                 isLoved: this.state.isLoved,
-                isInCart: this.state.isInCart
+                isInCart: this.state.isInCart,
+                detail: this.props.product
             }
             await AsyncStorage.setItem(pid, JSON.stringify(status))
         })
@@ -55,7 +56,8 @@ export default class Products extends Component {
         }), async() => {
             let status = {
                 isLoved: this.state.isLoved,
-                isInCart: this.state.isInCart
+                isInCart: this.state.isInCart,
+                detail: this.props.product
             }
             await AsyncStorage.setItem(pid, JSON.stringify(status))
         })
