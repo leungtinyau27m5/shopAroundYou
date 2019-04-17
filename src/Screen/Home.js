@@ -91,7 +91,7 @@ export default class Home extends Component {
         return true
     }
     searchScreen = () => {
-        this.notInFocus()
+        this.sceneIsBlur()
         this.props.navigation.navigate('Explore')
     }
     render() {

@@ -5,16 +5,20 @@ import {
     StyleSheet,
     TouchableOpacity,
     Dimensions,
-    Image
+    Image,
+    ToastAndroid
 } from 'react-native'
+import Modal from 'react-native-modal'
 
 function ItemContainer(props) {
     return (
         <View style={styles.itemContainer}>
             {props.items.map((item, index) => {
                 return (
-                    <TouchableOpacity key={`item-${item}`}>
-                        <Text style={[styles.itemTitle, index % 2 == 0 ? {backgroundColor: '#FFF'} : {backgroundColor: '#F6F6F6'}]}>{item}</Text>
+                    <TouchableOpacity 
+                        onPress={() => item.onClickModal()}
+                        key={`item-${item.name}-${index}`}>
+                        <Text style={[styles.itemTitle, index % 2 == 0 ? {backgroundColor: '#FFF'} : {backgroundColor: '#F6F6F6'}]}>{item.name}</Text>
                     </TouchableOpacity>
                 )
             })}
@@ -27,8 +31,28 @@ export default class DashboardAll extends Component {
         super() 
         this.state = {
             activeSlide: 0,
-            
+            addressesModal: false,
+            commentsModal: false,
+            recordsModal: false,
         }
+    }
+    _showAddressModal = () => {
+        this.setState((prevState) => ({
+            addressesModal: !prevState.addressesModal
+        }))
+    }
+    _showCommentsModal = () => {
+        this.setState((prevState) => ({
+            commentsModal: !prevState.commentsModal
+        }))
+    }
+    _showRecordsModal = () => {
+        this.setState((prevState) => ({
+            recordsModal: !prevState.recordsModal
+        }))
+    }
+    _notifyNotFinished(){
+        ToastAndroid.show('Coming soon.....', ToastAndroid.SHORT)
     }
     render() {
         return (
@@ -36,14 +60,61 @@ export default class DashboardAll extends Component {
                 <View style={styles.itemHeaderContainer}>
                     <Text style={styles.itemHeader}>My Account</Text>
                 </View>
-                <ItemContainer items={["Settings", "My addresses", "My comments"]} />
+                <ItemContainer
+                    items={[
+                        {
+                            name: "Settings",
+                            onClickModal: this._notifyNotFinished
+                        },
+                        {
+                            name: "My addresses",
+                            onClickModal: this._showAddressModal
+                        },
+                        {
+                            name: "My Comments",
+                            onClickModal: this._showCommentsModal
+                        },
+                    ]}
+                />
                 <View style={styles.itemHeaderContainer}>
                     <Text style={styles.itemHeader}>Orders</Text>
                 </View>
-                <ItemContainer items={["Records", "Payments"]} />
+                <ItemContainer
+                    items={[
+                        {
+                            name: "Records",
+                            onClickModal: this._showRecordsModal
+                        },
+                        {
+                            name: "Payments",
+                            onClickModal: this._notifyNotFinished
+                        }
+                    ]}
+                />
                 <View style={styles.itemHeaderContainer}>
                     <Text style={styles.itemHeader}>About Us</Text>
                 </View>
+                <Modal
+                    isVisible={this.state.addressesModal} 
+                    onBackdropPress={() => this._showAddressModal()}
+                    onBackButtonPress={() => {this.setState({ addressesModal: false })}}
+                >
+                    <View></View>
+                </Modal>
+                <Modal
+                    isVisible={this.state.commentsModal} 
+                    onBackdropPress={() => this._showCommentsModal()}
+                    onBackButtonPress={() => {this.setState({ commentsModal: false })}}
+                >
+                    <View></View>
+                </Modal>
+                <Modal
+                    isVisible={this.state.recordsModal} 
+                    onBackdropPress={() => this._showRecordsModal()}
+                    onBackButtonPress={() => {this.setState({ recordsModal: false })}}
+                >
+                    <View></View>
+                </Modal>
             </View>
         )
     }

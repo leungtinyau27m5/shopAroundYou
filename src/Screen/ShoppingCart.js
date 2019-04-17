@@ -377,6 +377,7 @@ export default class ShoppingCart extends Component {
         this.setState({
             products: products
         })
+        ToastAndroid.show('It is added to Cart', ToastAndroid.SHORT)
         this._getProducts()
     }
     _checkOut = () => {
