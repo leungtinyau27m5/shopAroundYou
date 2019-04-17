@@ -102,7 +102,6 @@ export default class Products extends Component {
                             >{product.product_name}</Text>
                         </View>
                         <View style={styles.content}>
-                            <Text>{product.description}</Text>
                             <Text style={{
                                 marginTop: 15,
                                 fontSize: 20,
@@ -161,10 +160,14 @@ export default class Products extends Component {
                 <Modal 
                     isVisible={this.state.productModal} 
                     onBackdropPress={() => this._showProductModal()}
-                    onBackButtonPress={() => {this.setState({ loginModal: false })}}
+                    onBackButtonPress={() => {this.setState({ productModal: false })}}
                 >
                     <ProductDetail
                         product={product}
+                        isLoved={this.state.isLoved}
+                        isInCart={this.state.isInCart}
+                        addToCart={this._addToCart}
+                        addToLoved={this._addToLoved}
                     />
                 </Modal>
             </View>

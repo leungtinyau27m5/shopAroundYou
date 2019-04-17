@@ -368,7 +368,7 @@ export default class Dashboard extends Component {
                                 width: profileHeight,
                                 height: profileHeight
                             }}
-                            source={this.state.personalData == null ? require('../assets/img/user.png') : {uri: `${serverConn.serverAssets}customers/${this.state.personalData.myIcon}`}} 
+                            source={this.state.personalData == null ? require('../assets/img/user.png') : {uri: `${serverConn.serverAssets}${this.state.personalData.myIcon}`}} 
                         />
                     </Animated.View>
                     </TouchableOpacity>
