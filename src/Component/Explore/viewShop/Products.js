@@ -5,7 +5,8 @@ import {
     StyleSheet,
     Dimensions,
     TouchableOpacity,
-    Image
+    Image,
+    TextInput
 } from 'react-native'
 import { serverConn } from '../../../Server/config'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -13,13 +14,79 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Modal from 'react-native-modal'
 import ProductDetail from '../ProductDetail'
 
+const NumberInput = (props) => {
+    return (
+        <View style={{
+            width: props.width,
+            height: props.height,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            textAlign: 'center'
+        }}>
+            <View
+                style={{
+                    justifyContent: 'center'
+                }}
+            >
+                <FontAwesome
+                    onPress={() => {
+                        props.changeValue(props.value - 1)
+                    }}
+                    name={`minus`}
+                    size={props.buttonSize}
+                />
+            </View>
+            <View
+                style={{
+                    justifyContent: 'center'
+                }}
+            >
+            <TextInput
+                style={{
+                    fontSize: props.fontSize,
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    padding: 0,
+                    height: 20 + props.fontSize,
+                    paddingVertical: 5,
+                    paddingHorizontal: 5,
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 5,
+                    marginRight: 5
+                }}
+                onChangeText={(value) => props.changeValue(value)}
+                keyboardType='numeric'
+                value={props.value.toString()}
+            />
+            </View>
+            <View
+                style={{
+                    justifyContent: 'center'
+                }}
+            >
+            <FontAwesome
+                onPress={() => {
+                    props.changeValue(props.value + 1)
+                }}
+                name={`plus`}   
+                size={props.buttonSize}
+                style={{
+                    justifyContent: 'center'
+                }}
+            />
+            </View>
+        </View>
+    )
+}
 export default class Products extends Component {
     constructor(props) {
         super()
         this.state = {
             isLoved: false,
             isInCart: false,
-            productModal: false
+            productModal: false,
+            value: 1
         }
         //console.log('product page', this.props)
         if (props.product !== null)
@@ -40,24 +107,28 @@ export default class Products extends Component {
     }
     _addToCart = (pid) => {
         this.setState((prevStatus) => ({
+            isLoved: false,
             isInCart: !prevStatus.isInCart
         }), async() => {
             let status = {
                 isLoved: this.state.isLoved,
                 isInCart: this.state.isInCart,
-                detail: this.props.product
+                detail: this.props.product,
+                value: this.state.value
             }
             await AsyncStorage.setItem(pid, JSON.stringify(status))
         })
     }
     _addToLoved = (pid) => {
         this.setState((prevStatus) => ({
+            isInCart: false,
             isLoved: !prevStatus.isLoved
         }), async() => {
             let status = {
                 isLoved: this.state.isLoved,
                 isInCart: this.state.isInCart,
-                detail: this.props.product
+                detail: this.props.product,
+                value: this.state.value
             }
             await AsyncStorage.setItem(pid, JSON.stringify(status))
         })
@@ -113,17 +184,34 @@ export default class Products extends Component {
                                     width: '100%'
                                 }}
                             >
-                                <TouchableOpacity
-                                    style={[{flex: 1}, styles.resButton]}
-                                    onPress={() => this._showProductModal()}
-                                >
-                                    <FontAwesome
-                                        name={`list-ul`}
-                                        size={16}
-                                        style={{marginRight: 5}}
+                                <View style={{alignItems: 'flex-start', flex: 1, justifyContent: 'center'}}>
+                                    <NumberInput
+                                        width={80}
+                                        height={50}
+                                        changeValue={(value) => {
+                                            if (value >=1 && value <= 100) {
+                                                this.setState({
+                                                    value: value
+                                                })
+                                            }
+                                        }}
+                                        buttonSize={15}
+                                        fontSize={18}
+                                        value={this.state.value}
                                     />
-                                    <Text>View More</Text>
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[{flex: 1}, styles.resButton]}
+                                        onPress={() => this._showProductModal()}
+                                    >
+                                        <FontAwesome
+                                            name={`list-ul`}
+                                            size={16}
+                                            style={{marginRight: 5}}
+                                        />
+                                        <Text>View More</Text>
+                                    </TouchableOpacity>
+
+                                </View>
                                 <View style={{
                                     alignItems: 'flex-end',
                                     flex: 1
