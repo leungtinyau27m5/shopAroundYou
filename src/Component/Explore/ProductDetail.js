@@ -46,7 +46,8 @@ class UserComment extends Component {
                     borderWidth: 2,
                     alignSelf: 'center',
                     padding: 8,
-                    borderRadius: 20
+                    borderRadius: 20,
+                    marginTop: 20
                 }}
             >
                 <View
@@ -106,7 +107,7 @@ class ImageGallery extends Component {
     constructor(props) {
         super()
         this.state = {
-            showImageFullScreen: false
+            showImageFullScreen: false,
         }
     }
     render() {
@@ -182,6 +183,7 @@ export default class ProductDetail extends Component {
             request: 'getComments',
             pid: this.props.product.pid
         }
+        console.log('data in Product Detail', data)
         fetch(serverConn.serverUri, {
             method: 'POST',
             header: {
@@ -194,7 +196,7 @@ export default class ProductDetail extends Component {
         .then((response) => response.json())
         .then(res => {
             this.setState({
-                comments: res
+                comments: res,
             })
         })
         .catch(error => console.log(error))
@@ -228,10 +230,9 @@ export default class ProductDetail extends Component {
         return stars
     }
     _renderComments = (comments) => {
-        console.log(comments)
         if (comments == null || comments == '') {
             return (
-                <View style={{width: '100%', padding: 20}}>
+                <View style={{width: '100%', padding: 20, justifyContent: 'center'}}>
                     <Text>There is no comment about that product yet</Text>
                 </View>
             )
@@ -244,6 +245,7 @@ export default class ProductDetail extends Component {
     render() {
         const { comments } = this.state
         const { product } = this.props
+
         if (comments == null) return(<View></View>)
         return (
             <View style={{

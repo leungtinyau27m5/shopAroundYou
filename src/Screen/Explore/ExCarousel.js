@@ -11,6 +11,7 @@ import Carousel from 'react-native-snap-carousel';
 
 import { Styles } from '../../Component/constants/Styles'
 import { serverConn } from '../../Server/config'
+
 let dataSize = 0
 
 export default class StackReact extends Component {
@@ -32,10 +33,12 @@ export default class StackReact extends Component {
             this._carousel.snapToItem(index)
     }
     _carouselOnScroll = (event) => {
+        /*
         const num = Math.floor(event.nativeEvent.contentOffset.x)
         const screenWidth = Dimensions.get('window').width
         let index = 0
         let isChanged = false
+        console.log(this._carousel.currentIndex)
         for (let i = 0; i < dataSize; i++) {
             if (num <= i * screenWidth) {
                 index = i
@@ -47,18 +50,27 @@ export default class StackReact extends Component {
                     i = dataSize
                 }
             }
+        }*/
+        let isChanged = false
+        if (this.state.activeSlide !== this._carousel.currentIndex) {
+            this.setState({
+                activeSlide: this._carousel.currentIndex
+            })
+            isChanged = true
         }
+        console.log(isChanged + '    index:      ' + this._carousel.currentIndex)
         if (isChanged)
-            this.props.viewShopOnScroll(index)
+            this.props.viewShopOnScroll(this._carousel.currentIndex)
     }
     _renderItem = ({item, index}) => {
+
         return (
-            <TouchableOpacity style={Styles.slide}
+            <TouchableOpacity style={[Styles.slide, {}]}
                 onPress={() => { 
                 this.carouselIsClicked(item, index)
               }}
             >
-                <View style={Styles.card}>
+                <View style={[Styles.card]}>
                     <Image
                         style={[Styles.cardImage, {width: '100%', height: 145}]}
                         source={{uri: `${serverConn.serverAssets}${item.image_uri}`}}
@@ -100,9 +112,11 @@ export default class StackReact extends Component {
                         itemHeight={256}
                         firstItem={0}
                         useScrollView={true}
-                        pagingEnabled={true}
+                        //pagingEnabled={true}
                         scrollEventThrottle={16}
-                        onScroll={this._carouselOnScroll}
+                        //onScroll={this._carouselOnScroll}
+                        enableMomentum={true}
+                        onMomentumScrollEnd={this._carouselOnScroll}
                         //onScrollEndDrag={this._carouselOnScroll}
                         //onScroll={(index) => {console.log('it is on scroll')}}
                     />

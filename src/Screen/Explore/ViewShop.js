@@ -34,7 +34,7 @@ export default class ViewShop extends Component {
                 isProduct: true,
             },
             shopDetail: null,
-            isLoading: false
+            isLoading: false,
         }
         this._tabsScrollView = null
     }
@@ -117,6 +117,7 @@ export default class ViewShop extends Component {
         if (this.state.shopDetail == null) return (<View><Text>There is no products</Text></View>)
         //console.log('comments', this.state.shopDetail.product_comments)
         let newArr = this.state.shopDetail.products.map((ele, index) => {
+            //console.log('View shop, _Render', ele)
             return (
                 <Products
                     key={`product-${ele.pid}`}
@@ -153,7 +154,7 @@ export default class ViewShop extends Component {
             const ele = this.state.shopDetail.labour[i]
             if (ele.position == 'Owner')
                 owner.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position = 'Senior_Manager')
+            else if (ele.position == 'Senior_Manager')
                 sm.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
             else if (ele.position == 'Manager')
                 m.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
@@ -204,29 +205,6 @@ export default class ViewShop extends Component {
                 </View>
             </View>
         )
-
-        /*
-        let newArr = this.state.shopDetail.labour.map((ele, index) => {
-            let owner
-            let sm
-            let m
-            let sc
-            let c
-            let pt
-            if (ele.position == 'Owner')
-                owner.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position = 'Senior_Manager')
-                sm.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position == 'Manager')
-                m.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position == 'Senior_Clerk')
-                sc.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position == 'Clerk')
-                c.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-            else if (ele.position == 'Part_Time_Clerk')
-                pt.push(<Labours key={`labour-${ele.labour_id}`} labour={ele} />)
-        })
-        return newArr*/
     }
     render() {
         const { shopDetail } = this.state

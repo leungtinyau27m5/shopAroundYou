@@ -26,14 +26,20 @@ class ProductInCart extends Component {
             isLoading: false
         }
     }
-    _changeQuantity = (value) => {
+    _changeQuantity = (value, isIncrement) => {
         if (value >= 0 && value <= 100) {
             this.setState({
                 value: value
             })
+            if (this.props.isCart) {
+                if (isIncrement)
+                    this.props.changeAmount(this.props.product.price)
+                else 
+                    this.props.changeAmount(-this.props.product.price)
+            }
         }
     }
-    _addNewQuantity = (value) => {
+    _addNewQuantity = (value, isIncrement) => {
         if (value >= 0 && value <= 100) {
             this.setState({
                 newAdd: value
@@ -41,7 +47,7 @@ class ProductInCart extends Component {
         }
     }
     _addToCart = async(product) => {
-        console.log(product)
+        //console.log(product)
         const data = {
             isLoved: false,
             isInCart: true,
@@ -147,7 +153,7 @@ class ProductInCart extends Component {
                             <View style={{flex: 1, flexDirection: 'row'}}>
                                 <View style={{flex: 1, justifyContent: 'center'}}>
                                     <FontAwesome
-                                        onPress={() => this._changeQuantity(this.state.value - 1)}
+                                        onPress={() => this._changeQuantity(this.state.value - 1, false)}
                                         name={`minus`}
                                         size={10}
                                     />
@@ -157,7 +163,7 @@ class ProductInCart extends Component {
                                 </View>
                                 <View style={{flex: 1, justifyContent: 'center'}}>
                                     <FontAwesome
-                                        onPress={() => this._changeQuantity(this.state.value + 1)}
+                                        onPress={() => this._changeQuantity(this.state.value + 1, true)}
                                         name={`plus`}
                                         size={10}
                                     />
@@ -183,7 +189,7 @@ class ProductInCart extends Component {
                         <View style={[{flexDirection: 'row', marginTop: 15}, this.props.isCart ? {display: 'none'} : {display: 'flex'}]}>
                             <View style={{justifyContent: 'center'}}>
                                 <FontAwesome
-                                    onPress={() => this._addNewQuantity(this.state.newAdd - 1)}
+                                    onPress={() => this._addNewQuantity(this.state.newAdd - 1, false)}
                                     name={`minus`}
                                     size={20}
                                 />
@@ -193,7 +199,7 @@ class ProductInCart extends Component {
                             </View>
                             <View style={{justifyContent: 'center'}}>
                                 <FontAwesome
-                                    onPress={() => this._addNewQuantity(this.state.newAdd + 1)}
+                                    onPress={() => this._addNewQuantity(this.state.newAdd + 1, true)}
                                     name={`plus`}
                                     size={20}
                                 />
@@ -237,7 +243,8 @@ export default class ShoppingCart extends Component {
             products: null,
             isCart: true,
             isLoading: false,
-            totalAmount: 0
+            totalAmount: 0,
+            firstTime: true
         }
         console.log('hello schopping cart screen')
     }
@@ -281,7 +288,7 @@ export default class ShoppingCart extends Component {
         })
     }
     removeItem = async(pid, isCart) => {
-        console.log('removeItem', pid)
+        //console.log('removeItem', pid)
         let json = await AsyncStorage.getItem(pid)
         let asyncData = JSON.parse(json)
         if (isCart)
@@ -295,10 +302,12 @@ export default class ShoppingCart extends Component {
         for (let i = 0; i < products.length; i++) {
             if (products[i].detail.pid === pid) {
                 //products.splice(i, 1)
-                if (isCart)
+                if (isCart) {
                     products[i].isInCart = false
-                else
+                    totalAmount -= (products[i].detail.price * products[i].value)
+                } else {
                     products[i].isLoved = false
+                }
             }
         }
         this.setState({
@@ -317,6 +326,19 @@ export default class ShoppingCart extends Component {
             })
         }
     }
+    changeAmount = (value) => {
+        let v = parseFloat(value)
+        if (this.state.firstTime) {
+            this.setState({
+                totalAmount: (parseFloat(totalAmount) + v),
+                firstTime: false
+            })
+        } else {
+            this.setState((prevState) => ({
+                totalAmount: prevState.totalAmount + v
+            }))
+        }
+    }
     _renderCartPage = (products) => {
         if (products == null) return (<View></View>)
         let amount = 0
@@ -332,6 +354,7 @@ export default class ShoppingCart extends Component {
                         value={ele.value}
                         removeItem={this.removeItem}
                         isCart={true}
+                        changeAmount={this.changeAmount}
                     />
                 )
             }
@@ -342,7 +365,7 @@ export default class ShoppingCart extends Component {
     _renderLovePage = (products) => {
         if (products == null) return (<View></View>)
         let newArr = products.map((ele, index) => {
-            console.log(ele.isLoved)
+            //console.log(ele.isLoved)
             if (ele.isLoved) {
                 return (
                     <ProductInCart
@@ -352,6 +375,7 @@ export default class ShoppingCart extends Component {
                         removeItem={this.removeItem}
                         isCart={false}
                         addItemToCartPage={this.addItemToCartPage}
+                        changeAmount={this.changeAmount}
                     />
                 )
             }
@@ -399,7 +423,7 @@ export default class ShoppingCart extends Component {
     }
     render() {
         const { products } = this.state
-
+        const amount = this.state.totalAmount
         return (
             <View>
                 <NavigationEvents 
@@ -448,7 +472,7 @@ export default class ShoppingCart extends Component {
                             <Text style={{fontSize: 18}}>Total: </Text>
                         </View>
                         <View style={{flex: 1, justifyContent: 'center'}}>
-                            <Text style={{fontSize: 26, color: '#7FB546', fontWeight: 'bold'}}>$ {totalAmount}</Text>
+                            <Text style={{fontSize: 26, color: '#7FB546', fontWeight: 'bold'}}>$ {this.state.firstTime ? parseFloat(totalAmount).toFixed(2) : parseFloat(this.state.totalAmount).toFixed(2)}</Text>
                         </View>
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                             <TouchableOpacity
