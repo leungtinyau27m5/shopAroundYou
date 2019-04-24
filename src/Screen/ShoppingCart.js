@@ -8,7 +8,8 @@ import {
     ScrollView,
     Image,
     TouchableOpacity,
-    ToastAndroid
+    ToastAndroid,
+    ListView
 } from 'react-native'
 import { serverConn } from '../Server/config'
 import {NavigationEvents} from 'react-navigation'
@@ -458,12 +459,16 @@ export default class ShoppingCart extends Component {
                     <View
                         style={styles.tabPage}
                     >
-                        {this._renderCartPage(products)}
+                        <ScrollView>
+                            {this._renderCartPage(products)}
+                        </ScrollView>
                     </View>
                     <View
                         style={styles.tabPage}
                     >
-                        {this._renderLovePage(products)}
+                        <ScrollView>
+                            {this._renderLovePage(products)}
+                        </ScrollView>
                     </View>
                 </ScrollView>
                 <View style={[{justifyContent: 'center'}, this.state.isCart ? {display: 'flex'} : {display: 'none'}]}>

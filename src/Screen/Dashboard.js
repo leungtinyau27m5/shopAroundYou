@@ -164,7 +164,7 @@ export default class Dashboard extends Component {
                 .then((response) => response.json())
                 .then(responseData => {
                     console.log('checking ', responseData)
-                    if (responseData) {
+                    if (responseData === true) {
                         ToastAndroid.show('Register success', ToastAndroid.SHORT)
                         this.setState({
                             isLoading: false
@@ -172,8 +172,11 @@ export default class Dashboard extends Component {
                             this.userLogin(false, content.regUsername, content.regPassword, true)
                             this.props.navigation.navigate('Home')
                         })
-                    } else {
+                    } else if (responseData === false){
                         ToastAndroid.show('repeated username', ToastAndroid.SHORT)
+                    } else {
+                        console.log(responseData)
+                        ToastAndroid.show('server response Error', ToastAndroid.SHORT)
                     }
                 })
                 .catch((error) => {
